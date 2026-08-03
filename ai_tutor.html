@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="max-w-5xl mx-auto space-y-8">
+
+    <div>
+        <h2 class="font-display text-4xl font-semibold text-white">Desglosador Inteligente</h2>
+        <p class="text-sm text-muted mt-1">Convierte instrucciones densas en planes paso a paso.</p>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+
+        <div class="bg-surface p-6 rounded-2xl border border-white/5 space-y-4">
+            <form method="POST" class="space-y-4">
+                <textarea name="raw_input" rows="12" placeholder="Pega aquí tus instrucciones, guías o lista de tareas..." class="w-full bg-deep border border-white/10 rounded-xl p-4 text-sm text-ink focus:outline-none focus:border-gold/60 focus:ring-2 focus:ring-gold/10 transition-all resize-none">{{ raw_input }}</textarea>
+
+                <button type="submit" class="w-full bg-gradient-to-r from-gold to-gold-soft hover:brightness-110 text-deep font-bold py-3.5 rounded-xl shadow-lg shadow-gold/10 transition-all flex items-center justify-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M5.6 18.4l2.1-2.1M16.3 7.7l2.1-2.1"/><circle cx="12" cy="12" r="3"/></svg>
+                    Optimizar Carga con IA
+                </button>
+            </form>
+        </div>
+
+        <div class="bg-surface p-6 rounded-2xl border border-white/5 flex flex-col">
+            <h3 class="text-lg font-display font-semibold text-white mb-4">Estrategia Organizacional</h3>
+
+            <div class="flex-1 bg-deep border border-white/5 rounded-xl p-5 text-sm text-ink/90 overflow-y-auto max-h-[480px] leading-relaxed">
+                {% if ai_response %}
+                    {{ ai_response | safe }}
+                {% else %}
+                    <div class="h-full flex items-center justify-center text-center text-muted">
+                        <p>Ingresa tus tareas a la izquierda y presiona el botón para recibir la estrategia estructurada.</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+    </div>
+
+</div>
+{% endblock %}
