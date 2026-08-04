@@ -1,4 +1,5 @@
 import os
+import re
 from flask import Flask, render_template, redirect, url_for, request, flash
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
@@ -232,12 +233,19 @@ def ai_tutor():
                 "Actúas como un tutor experto en productividad y organización académica para el "
                 "Colegio Colombo Americano (CAS). El usuario te va a pasar un texto confuso o largo con "
                 "una o múltiples tareas escolares. Tu deber es analizarlo y devolver una respuesta limpia, "
-                "estructurada en HTML utilizando clases de Tailwind CSS si es necesario (solo contenedores "
-                "y texto, sin bloques HTML completos, sin markdown, sin ```html). Debes: 1) Clasificar el "
-                "nivel de esfuerzo de la entrega (1 al 5). 2) Dividir el trabajo en sub-tareas viables por "
-                "días. 3) Recomendar una técnica de estudio adecuada (ej. Pomodoro, Mapas Mentales). "
-                "4) Cerrar con una frase corta, motivacional, sofisticada y con liderazgo. Mantén un tono "
-                "elegante y minimalista."
+                "estructurada en HTML simple (solo <p>, <ul>, <li>, <strong>, <h4>, <blockquote> — sin "
+                "bloques HTML completos, sin markdown, sin ```html). REGLA ESTRICTA: nunca incluyas "
+                "atributos class, style, ni ninguna clase de color de texto o fondo (nada de text-gray, "
+                "text-slate, bg-*, etc.) — el contenedor ya define el color; tu HTML debe ser semántico y "
+                "sin estilos propios. Debes: 1) Clasificar el nivel de esfuerzo de la entrega (1 al 5) "
+                "dentro de un <p>, con una frase explicando por qué. 2) Dividir el trabajo en sub-tareas "
+                "viables por días usando <ul><li>, y para cada sub-tarea da un detalle concreto y "
+                "accionable (no solo el nombre de la materia — explica qué hacer exactamente, con cuánto "
+                "tiempo estimado). 3) Recomendar una técnica de estudio adecuada (ej. Pomodoro, Mapas "
+                "Mentales) en un <p>, explicando brevemente cómo aplicarla a este caso específico. "
+                "4) Cerrar con una frase corta, motivacional, sofisticada y con liderazgo dentro de "
+                "<blockquote>. Mantén un tono elegante, minimalista, y sé específico — evita respuestas "
+                "genéricas o demasiado breves."
             )
             try:
                 completion = groq_client.chat.completions.create(
@@ -247,9 +255,13 @@ def ai_tutor():
                         {"role": "user", "content": f"Texto del estudiante:\n{raw_input}"},
                     ],
                     temperature=0.6,
-                    max_tokens=1200,
+                    max_tokens=2000,
                 )
                 ai_response = completion.choices[0].message.content
+                # Seguro adicional: quita cualquier class="" o style="" que el modelo
+                # cuele a pesar de la instrucción, para que el texto nunca quede ilegible
+                # sobre el fondo oscuro.
+                ai_response = re.sub(r'\s(class|style)="[^"]*"', '', ai_response)
             except Exception as e:
                 ai_response = f"<p class='text-rose-300'>Error al conectar con la IA de Groq: {str(e)}</p>"
 
