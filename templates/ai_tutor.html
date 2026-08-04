@@ -52,7 +52,7 @@
                             <div class="bg-surface border border-white/5 rounded-xl p-4">
                                 <p class="text-[11px] font-bold uppercase tracking-wider text-gold mb-2">Día {{ day.day_number }} — {{ day.day_title }}</p>
                                 <div class="space-y-2">
-                                    {% for item in day.items %}
+                                    {% for item in day.tasks %}
                                     <div>
                                         <p class="text-xs font-bold text-white">{{ item.subject }}:</p>
                                         <p class="text-xs text-ink/80 leading-snug">{{ item.task }}</p>
