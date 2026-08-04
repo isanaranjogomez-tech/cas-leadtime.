@@ -1,5 +1,5 @@
 import os
-import re
+import json
 from flask import Flask, render_template, redirect, url_for, request, flash
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
@@ -220,52 +220,49 @@ def delete_task(task_id):
 @login_required
 def ai_tutor():
     ai_response = None
+    days_plan = None
     raw_input = ""
     if request.method == 'POST':
         raw_input = request.form.get('raw_input', '')
 
         if not groq_client:
-            ai_response = ("<p class='text-rose-300'>No hay una API Key de Groq configurada en este "
-                            "entorno. Define la variable de entorno GROQ_API_KEY para activar el "
-                            "Desglosador IA.</p>")
+            ai_response = ("<p>No hay una API Key de Groq configurada en este entorno. Define la "
+                            "variable de entorno GROQ_API_KEY para activar el Desglosador IA.</p>")
         else:
             system_prompt = (
                 "Actúas como un tutor experto en productividad y organización académica para el "
                 "Colegio Colombo Americano (CAS). El usuario te va a pasar un texto confuso o largo con "
-                "una o múltiples tareas escolares. Tu deber es analizarlo y devolver una respuesta limpia, "
-                "estructurada en HTML simple (solo <p>, <ul>, <li>, <strong>, <h4>, <blockquote> — sin "
-                "bloques HTML completos, sin markdown, sin ```html). REGLA ESTRICTA: nunca incluyas "
-                "atributos class, style, ni ninguna clase de color de texto o fondo (nada de text-gray, "
-                "text-slate, bg-*, etc.) — el contenedor ya define el color; tu HTML debe ser semántico y "
-                "sin estilos propios. Debes: 1) Clasificar el nivel de esfuerzo de la entrega (1 al 5) "
-                "dentro de un <p>, con una frase explicando por qué. 2) Dividir el trabajo en sub-tareas "
-                "viables por días usando <ul><li>, y para cada sub-tarea da un detalle concreto y "
-                "accionable (no solo el nombre de la materia — explica qué hacer exactamente, con cuánto "
-                "tiempo estimado). 3) Recomendar una técnica de estudio adecuada (ej. Pomodoro, Mapas "
-                "Mentales) en un <p>, explicando brevemente cómo aplicarla a este caso específico. "
-                "4) Cerrar con una frase corta, motivacional, sofisticada y con liderazgo dentro de "
-                "<blockquote>. Mantén un tono elegante, minimalista, y sé específico — evita respuestas "
-                "genéricas o demasiado breves."
+                "una o múltiples tareas escolares. Analízalo y responde ÚNICAMENTE con un objeto JSON "
+                "válido (sin texto antes o después, sin ```json, sin comentarios), con exactamente esta "
+                "forma:\n"
+                '{"subtitle": "COLEGIO COLOMBO AMERICANO", "title": "título corto y sofisticado del plan '
+                '(máx 6 palabras)", "intro": "1-2 frases explicando el volumen de trabajo y el enfoque '
+                'elegido", "effort_level": <entero 1-5>, "days": [{"day_number": <entero>, "day_title": '
+                '"título corto del enfoque de ese día (máx 5 palabras)", "items": [{"subject": "materia", '
+                '"task": "qué hacer exactamente, concreto y accionable"}]}], "technique_title": "nombre de '
+                'la técnica de estudio recomendada", "technique_description": "1-3 frases explicando cómo '
+                'aplicarla a este caso específico", "closing_quote": "frase corta, motivacional, '
+                'sofisticada y con liderazgo"}\n'
+                "Distribuye el trabajo en máximo 5 días. Sé específico y concreto en cada tarea, evita "
+                "generalidades. El intro y closing_quote deben sonar elegantes y con autoridad."
             )
             try:
                 completion = groq_client.chat.completions.create(
-                    model="llama-3.3-70b-versatile",
+                    model="openai/gpt-oss-120b",
                     messages=[
                         {"role": "system", "content": system_prompt},
                         {"role": "user", "content": f"Texto del estudiante:\n{raw_input}"},
                     ],
                     temperature=0.6,
                     max_tokens=2000,
+                    response_format={"type": "json_object"},
                 )
-                ai_response = completion.choices[0].message.content
-                # Seguro adicional: quita cualquier class="" o style="" que el modelo
-                # cuele a pesar de la instrucción, para que el texto nunca quede ilegible
-                # sobre el fondo oscuro.
-                ai_response = re.sub(r'\s(class|style)="[^"]*"', '', ai_response)
+                raw_json = completion.choices[0].message.content
+                days_plan = json.loads(raw_json)
             except Exception as e:
-                ai_response = f"<p class='text-rose-300'>Error al conectar con la IA de Groq: {str(e)}</p>"
+                ai_response = f"<p>Error al generar el plan con Groq: {str(e)}</p>"
 
-    return render_template('ai_tutor.html', ai_response=ai_response, raw_input=raw_input)
+    return render_template('ai_tutor.html', ai_response=ai_response, days_plan=days_plan, raw_input=raw_input)
 
 
 with app.app_context():
