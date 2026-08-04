@@ -4,7 +4,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime, timedelta
-import google.generativeai as genai
+from groq import Groq
 
 app = Flask(__name__)
 
@@ -25,10 +25,9 @@ db = SQLAlchemy(app)
 login_manager = LoginManager(app)
 login_manager.login_view = 'login'
 
-# ---- Gemini ----
-GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
-if GEMINI_API_KEY:
-    genai.configure(api_key=GEMINI_API_KEY)
+# ---- Groq (límite gratuito diario mucho más alto que Gemini) ----
+GROQ_API_KEY = os.getenv("GROQ_API_KEY")
+groq_client = Groq(api_key=GROQ_API_KEY) if GROQ_API_KEY else None
 
 SUBJECTS = ["Math", "Language Arts", "Lenguaje", "Geometría", "Global Perspectives",
             "Sociales", "Biología", "Física", "Química", "Computer Science"]
@@ -224,9 +223,9 @@ def ai_tutor():
     if request.method == 'POST':
         raw_input = request.form.get('raw_input', '')
 
-        if not GEMINI_API_KEY:
-            ai_response = ("<p class='text-rose-300'>No hay una API Key de Gemini configurada en este "
-                            "entorno. Define la variable de entorno GEMINI_API_KEY para activar el "
+        if not groq_client:
+            ai_response = ("<p class='text-rose-300'>No hay una API Key de Groq configurada en este "
+                            "entorno. Define la variable de entorno GROQ_API_KEY para activar el "
                             "Desglosador IA.</p>")
         else:
             system_prompt = (
@@ -234,17 +233,25 @@ def ai_tutor():
                 "Colegio Colombo Americano (CAS). El usuario te va a pasar un texto confuso o largo con "
                 "una o múltiples tareas escolares. Tu deber es analizarlo y devolver una respuesta limpia, "
                 "estructurada en HTML utilizando clases de Tailwind CSS si es necesario (solo contenedores "
-                "y texto, sin bloques HTML completos). Debes: 1) Clasificar el nivel de esfuerzo de la "
-                "entrega (1 al 5). 2) Dividir el trabajo en sub-tareas viables por días. 3) Recomendar una "
-                "técnica de estudio adecuada (ej. Pomodoro, Mapas Mentales). 4) Cerrar con una frase corta, "
-                "motivacional, sofisticada y con liderazgo. Mantén un tono elegante y minimalista."
+                "y texto, sin bloques HTML completos, sin markdown, sin ```html). Debes: 1) Clasificar el "
+                "nivel de esfuerzo de la entrega (1 al 5). 2) Dividir el trabajo en sub-tareas viables por "
+                "días. 3) Recomendar una técnica de estudio adecuada (ej. Pomodoro, Mapas Mentales). "
+                "4) Cerrar con una frase corta, motivacional, sofisticada y con liderazgo. Mantén un tono "
+                "elegante y minimalista."
             )
             try:
-                model = genai.GenerativeModel('gemini-flash-latest')
-                response = model.generate_content(f"{system_prompt}\n\nTexto del estudiante:\n{raw_input}")
-                ai_response = response.text
+                completion = groq_client.chat.completions.create(
+                    model="llama-3.3-70b-versatile",
+                    messages=[
+                        {"role": "system", "content": system_prompt},
+                        {"role": "user", "content": f"Texto del estudiante:\n{raw_input}"},
+                    ],
+                    temperature=0.6,
+                    max_tokens=1200,
+                )
+                ai_response = completion.choices[0].message.content
             except Exception as e:
-                ai_response = f"<p class='text-rose-300'>Error al conectar con la IA de Gemini: {str(e)}</p>"
+                ai_response = f"<p class='text-rose-300'>Error al conectar con la IA de Groq: {str(e)}</p>"
 
     return render_template('ai_tutor.html', ai_response=ai_response, raw_input=raw_input)
 
