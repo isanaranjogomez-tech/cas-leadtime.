@@ -238,7 +238,7 @@ def ai_tutor():
                 '{"subtitle": "COLEGIO COLOMBO AMERICANO", "title": "título corto y sofisticado del plan '
                 '(máx 6 palabras)", "intro": "1-2 frases explicando el volumen de trabajo y el enfoque '
                 'elegido", "effort_level": <entero 1-5>, "days": [{"day_number": <entero>, "day_title": '
-                '"título corto del enfoque de ese día (máx 5 palabras)", "items": [{"subject": "materia", '
+                '"título corto del enfoque de ese día (máx 5 palabras)", "tasks": [{"subject": "materia", '
                 '"task": "qué hacer exactamente, concreto y accionable"}]}], "technique_title": "nombre de '
                 'la técnica de estudio recomendada", "technique_description": "1-3 frases explicando cómo '
                 'aplicarla a este caso específico", "closing_quote": "frase corta, motivacional, '
