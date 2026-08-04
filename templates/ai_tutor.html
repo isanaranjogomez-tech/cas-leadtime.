@@ -24,7 +24,7 @@
         <div class="bg-surface p-6 rounded-2xl border border-white/5 flex flex-col">
             <h3 class="text-lg font-display font-semibold text-white mb-4">Estrategia Organizacional</h3>
 
-            <div class="flex-1 bg-deep border border-white/5 rounded-xl p-5 text-sm text-ink/90 overflow-y-auto max-h-[480px] leading-relaxed">
+            <div class="flex-1 bg-deep border border-white/5 rounded-xl p-5 text-sm text-ink overflow-y-auto max-h-[480px] leading-relaxed ai-response">
                 {% if ai_response %}
                     {{ ai_response | safe }}
                 {% else %}
@@ -36,6 +36,15 @@
         </div>
 
     </div>
+
+    <style>
+        .ai-response p { margin-bottom: 0.85rem; color: #F3F1EA; }
+        .ai-response h4 { font-weight: 700; color: #E3B341; margin-top: 1rem; margin-bottom: 0.5rem; font-size: 0.95rem; text-transform: uppercase; letter-spacing: 0.03em; }
+        .ai-response ul { list-style: disc; padding-left: 1.25rem; margin-bottom: 0.85rem; color: #F3F1EA; }
+        .ai-response li { margin-bottom: 0.4rem; }
+        .ai-response strong { color: #F4D793; font-weight: 700; }
+        .ai-response blockquote { border-left: 3px solid #E3B341; padding-left: 1rem; margin-top: 1rem; font-style: italic; color: #98A1C4; }
+    </style>
 
 </div>
 {% endblock %}
