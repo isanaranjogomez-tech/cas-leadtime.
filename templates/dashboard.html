@@ -114,20 +114,32 @@
         <section class="card">
             <div class="card__head">
                 <h2 class="card__title">Tus pendientes</h2>
+                {% if overdue_count %}
+                <span class="eyebrow eyebrow--alert num">{{ overdue_count }} vencido{{ 's' if overdue_count != 1 }} · {{ tasks|length }} activo{{ 's' if tasks|length != 1 }}</span>
+                {% else %}
                 <span class="eyebrow num">{{ tasks|length }} activo{{ 's' if tasks|length != 1 }}</span>
+                {% endif %}
             </div>
 
             {% if tasks %}
                 {% for task in tasks %}
-                <article class="task">
+                {% set overdue = task.due_date < today %}
+                {% set days_late = (today - task.due_date).days if overdue else 0 %}
+                <article class="task{% if overdue %} task--overdue{% endif %}">
                     <div class="task__main">
                         <div class="task__meta">
                             <span class="tag tag--{{ task.type|lower }}">{{ task.type }}</span>
                             <span class="task__subject">{{ task.subject }}</span>
+                            {% if overdue %}
+                            <span class="tag tag--vencido">
+                                {%- if days_late == 1 %}Vencido ayer
+                                {%- else %}Vencido hace {{ days_late }} días{% endif -%}
+                            </span>
+                            {% endif %}
                         </div>
                         <h3 class="task__title">{{ task.title }}</h3>
                         {% if task.notes %}<p class="task__notes">{{ task.notes }}</p>{% endif %}
-                        <p class="task__due">Entrega <strong>{{ task.due_date|fecha }}</strong></p>
+                        <p class="task__due{% if overdue %} task__due--soon{% endif %}">Entrega <strong>{{ task.due_date|fecha }}</strong></p>
                     </div>
 
                     <div class="task__actions">
