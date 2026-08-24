@@ -214,7 +214,11 @@ def dashboard():
                 pieces.append(f"{day['tasks']} entrega" + ("s" if day['tasks'] > 1 else ""))
             critical_alerts.append(f"{formatted_date}: {' y '.join(pieces)}")
 
-    return render_template('dashboard.html', tasks=tasks, radar=radar,
+    today = datetime.now().date()
+    overdue_count = sum(1 for t in tasks if t.due_date < today)
+
+    return render_template('dashboard.html', tasks=tasks, radar=radar, today=today,
+                            overdue_count=overdue_count,
                             alerts=critical_alerts, subjects=SUBJECTS, task_types=TASK_TYPES)
 
 
