@@ -1,0 +1,819 @@
+/* ==========================================================================
+   CAS LeadTime AI — Sistema de diseño
+   Colegio Colombo Americano
+   Los colores institucionales están tomados directamente del escudo:
+   el azul del campo, el latón del anillo y el rojo de la cinta.
+   ========================================================================== */
+
+:root {
+  /* --- Identidad CAS -------------------------------------------------- */
+  --cas-navy:        #0E1240;
+  --cas-navy-deep:   #080B2C;
+  --cas-navy-soft:   #1B2154;
+  --cas-navy-line:   #2A3164;
+
+  --cas-brass:       #A6A181;
+  --cas-brass-warm:  #BFA76A;
+  --cas-brass-pale:  #E8E3D2;
+
+  --cas-red:         #C8102E;
+  --cas-red-pale:    #FBE9EC;
+
+  /* --- Superficies ---------------------------------------------------- */
+  --bg:              #F2F4FA;
+  --surface:         #FFFFFF;
+  --surface-sunk:    #F7F8FC;
+  --border:          #E1E5F0;
+  --border-strong:   #CDD4E4;
+
+  /* --- Texto ---------------------------------------------------------- */
+  --text:            #131834;
+  --text-2:          #565D7E;
+  --text-muted:      #8C93AC;
+  --text-on-navy:    #EEF0F8;
+
+  /* --- Estados -------------------------------------------------------- */
+  --success:         #1F7A5C;
+  --success-pale:    #E7F4EF;
+  --warning:         #B2811C;
+  --warning-pale:    #FBF2DF;
+  --error:           var(--cas-red);
+  --error-pale:      var(--cas-red-pale);
+  --info:            #3B4F9E;
+  --info-pale:       #EAEEFA;
+
+  /* --- Forma ---------------------------------------------------------- */
+  --r-sm: 6px;
+  --r-md: 10px;
+  --r-lg: 14px;
+  --r-xl: 20px;
+  --r-pill: 999px;
+
+  --shadow-sm: 0 1px 2px rgba(14, 18, 64, .06);
+  --shadow-md: 0 2px 8px rgba(14, 18, 64, .07);
+  --shadow-lg: 0 12px 32px rgba(14, 18, 64, .12);
+
+  /* --- Ritmo ---------------------------------------------------------- */
+  --s-1: 4px;
+  --s-2: 8px;
+  --s-3: 12px;
+  --s-4: 16px;
+  --s-5: 24px;
+  --s-6: 32px;
+  --s-7: 48px;
+  --s-8: 64px;
+
+  /* --- Tipografía ------------------------------------------------------ */
+  --font-display: 'Fraunces', Georgia, serif;
+  --font-body: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+
+  --header-h: 68px;
+}
+
+/* ==========================================================================
+   Base
+   ========================================================================== */
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+  min-height: 100vh;
+}
+
+h1, h2, h3, h4 { margin: 0; font-weight: 600; letter-spacing: -0.01em; }
+
+.display {
+  font-family: var(--font-display);
+  font-optical-sizing: auto;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+a { color: inherit; }
+
+:focus-visible {
+  outline: 2px solid var(--cas-brass-warm);
+  outline-offset: 2px;
+  border-radius: var(--r-sm);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: .01ms !important;
+    transition-duration: .01ms !important;
+  }
+}
+
+/* Etiqueta pequeña en versalitas — usada en toda la interfaz */
+.eyebrow {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .11em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.num { font-variant-numeric: tabular-nums; }
+
+/* ==========================================================================
+   Cabecera institucional
+   ========================================================================== */
+
+.site-header {
+  background: var(--cas-navy);
+  border-bottom: 3px solid var(--cas-brass);
+  color: var(--text-on-navy);
+  position: sticky;
+  top: 0;
+  z-index: 40;
+}
+
+.site-header__inner {
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: 0 var(--s-5);
+  min-height: var(--header-h);
+  display: flex;
+  align-items: center;
+  gap: var(--s-5);
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: var(--s-3);
+  text-decoration: none;
+  flex-shrink: 0;
+}
+
+.brand__crest {
+  width: 40px;
+  height: 40px;
+  display: block;
+  background: var(--cas-brass-pale);
+  border-radius: var(--r-pill);
+  padding: 2px;
+  box-shadow: 0 0 0 1px rgba(166,161,129,.55);
+}
+
+.brand__name {
+  font-family: var(--font-display);
+  font-size: 17px;
+  font-weight: 600;
+  color: #fff;
+  line-height: 1.15;
+  letter-spacing: -0.01em;
+}
+
+.brand__school {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--cas-brass);
+  line-height: 1.3;
+}
+
+.site-nav { display: flex; align-items: center; gap: var(--s-1); margin-left: auto; }
+
+.site-nav__link {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s-2);
+  padding: 9px 14px;
+  border-radius: var(--r-md);
+  font-size: 14px;
+  font-weight: 600;
+  color: #B9BFD9;
+  text-decoration: none;
+  transition: background .18s, color .18s;
+  white-space: nowrap;
+}
+
+.site-nav__link:hover { background: rgba(255,255,255,.07); color: #fff; }
+
+.site-nav__link[aria-current="page"] {
+  background: var(--cas-navy-soft);
+  color: #fff;
+  box-shadow: inset 0 0 0 1px var(--cas-navy-line);
+}
+
+.site-nav__link svg { width: 17px; height: 17px; flex-shrink: 0; }
+
+.site-user {
+  display: flex;
+  align-items: center;
+  gap: var(--s-3);
+  padding-left: var(--s-5);
+  margin-left: var(--s-2);
+  border-left: 1px solid rgba(255,255,255,.14);
+}
+
+.site-user__name { font-size: 13px; font-weight: 600; color: #fff; }
+.site-user__role { font-size: 10px; letter-spacing: .09em; text-transform: uppercase; color: var(--cas-brass); }
+
+.site-user__out {
+  color: #98A0C0;
+  display: inline-flex;
+  padding: 7px;
+  border-radius: var(--r-md);
+  transition: background .18s, color .18s;
+}
+.site-user__out:hover { background: rgba(255,255,255,.07); color: #fff; }
+.site-user__out svg { width: 17px; height: 17px; }
+
+@media (max-width: 720px) {
+  .site-header__inner {
+    flex-wrap: wrap;
+    padding: var(--s-3) var(--s-4);
+    gap: var(--s-3);
+    row-gap: 0;
+  }
+  .site-nav {
+    order: 3;
+    width: 100%;
+    margin-left: 0;
+    border-top: 1px solid rgba(255,255,255,.1);
+    padding-top: var(--s-2);
+    margin-top: var(--s-1);
+  }
+  .site-nav__link { flex: 1; justify-content: center; padding: 10px 8px; }
+  .site-user { margin-left: auto; padding-left: 0; border-left: 0; }
+  .site-user__meta { display: none; }
+  .brand__crest { width: 36px; height: 36px; }
+}
+
+/* ==========================================================================
+   Estructura de página
+   ========================================================================== */
+
+.page {
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: var(--s-6) var(--s-5) var(--s-8);
+}
+
+.page-head { margin-bottom: var(--s-6); }
+
+.page-head h1 {
+  font-family: var(--font-display);
+  font-size: clamp(26px, 4vw, 34px);
+  font-weight: 600;
+  letter-spacing: -0.025em;
+}
+
+.page-head p { margin: 6px 0 0; color: var(--text-2); font-size: 14px; }
+
+@media (max-width: 640px) {
+  .page { padding: var(--s-5) var(--s-4) var(--s-7); }
+}
+
+/* ==========================================================================
+   Tarjetas
+   ========================================================================== */
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  box-shadow: var(--shadow-sm);
+}
+
+.card__head {
+  padding: var(--s-4) var(--s-5);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s-4);
+  flex-wrap: wrap;
+}
+
+.card__title { font-size: 15px; font-weight: 700; }
+.card__body { padding: var(--s-5); }
+
+/* ==========================================================================
+   Bitácora de la semana — elemento distintivo
+   Cada pendiente es una marca sobre una línea de latón, como en una
+   agenda escolar de pared. Los exámenes son barras rojas; las entregas,
+   marcas azules. Se pueden contar a simple vista.
+   ========================================================================== */
+
+.ledger {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: var(--s-2);
+}
+
+.ledger__day {
+  position: relative;
+  padding: var(--s-3) var(--s-2) var(--s-3);
+  border-radius: var(--r-md);
+  background: var(--surface-sunk);
+  border: 1px solid transparent;
+  display: flex;
+  flex-direction: column;
+  min-height: 132px;
+}
+
+.ledger__day--today {
+  background: var(--cas-navy);
+  border-color: var(--cas-navy);
+}
+.ledger__day--today .ledger__dow,
+.ledger__day--today .ledger__count { color: var(--cas-brass); }
+.ledger__day--today .ledger__date { color: #fff; }
+.ledger__day--today .ledger__rule { background: rgba(166,161,129,.5); }
+
+.ledger__day--critical { background: var(--cas-red-pale); border-color: rgba(200,16,46,.22); }
+.ledger__day--medium   { background: var(--warning-pale); border-color: rgba(178,129,28,.2); }
+
+.ledger__dow {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.ledger__date {
+  font-family: var(--font-display);
+  font-size: 22px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.1;
+  margin-top: 2px;
+}
+
+/* marcas apiladas sobre la línea base */
+.ledger__marks {
+  margin-top: auto;
+  display: flex;
+  align-items: flex-end;
+  gap: 3px;
+  min-height: 34px;
+  flex-wrap: wrap;
+}
+
+.ledger__mark { width: 7px; border-radius: 2px; display: block; }
+.ledger__mark--exam { height: 30px; background: var(--cas-red); }
+.ledger__mark--task { height: 16px; background: var(--info); opacity: .75; }
+.ledger__day--today .ledger__mark--task { background: #7E8CD4; opacity: 1; }
+
+.ledger__rule { height: 2px; background: var(--cas-brass); margin-top: 6px; border-radius: 2px; }
+
+.ledger__count { font-size: 11px; color: var(--text-2); margin-top: 6px; font-weight: 600; }
+.ledger__count--empty { color: var(--text-muted); font-weight: 500; }
+
+.legend { display: flex; gap: var(--s-4); flex-wrap: wrap; }
+.legend span { display: inline-flex; align-items: center; gap: 6px; font-size: 11px; color: var(--text-2); font-weight: 600; }
+.legend i { width: 8px; height: 8px; border-radius: 2px; display: block; }
+
+@media (max-width: 860px) {
+  .ledger { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+}
+@media (max-width: 460px) {
+  .ledger { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 5px; }
+  .ledger__day { min-height: 104px; padding: 9px 6px; }
+  .ledger__date { font-size: 18px; }
+  .ledger__dow { font-size: 9px; letter-spacing: .06em; }
+  .ledger__count { font-size: 10px; }
+  .ledger__marks { min-height: 26px; gap: 2px; }
+  .ledger__mark { width: 5px; }
+  .ledger__mark--exam { height: 24px; }
+  .ledger__mark--task { height: 13px; }
+}
+
+/* ==========================================================================
+   Avisos
+   ========================================================================== */
+
+.notice {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--s-3);
+  padding: var(--s-3) var(--s-4);
+  border-radius: var(--r-md);
+  font-size: 14px;
+  font-weight: 500;
+  border: 1px solid;
+}
+.notice svg { width: 17px; height: 17px; flex-shrink: 0; margin-top: 2px; }
+.notice--error   { background: var(--error-pale);   border-color: rgba(200,16,46,.22); color: #8E0B20; }
+.notice--success { background: var(--success-pale); border-color: rgba(31,122,92,.22); color: #14573F; }
+.notice--warning { background: var(--warning-pale); border-color: rgba(178,129,28,.24); color: #7A5810; }
+
+.notice-stack { display: flex; flex-direction: column; gap: var(--s-2); margin-bottom: var(--s-5); }
+
+/* ==========================================================================
+   Formularios
+   ========================================================================== */
+
+.field { display: block; margin-bottom: var(--s-4); }
+
+.field > label {
+  display: block;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .09em;
+  text-transform: uppercase;
+  color: var(--text-2);
+  margin-bottom: 6px;
+}
+
+.input, .select, .textarea {
+  width: 100%;
+  font-family: inherit;
+  font-size: 14px;
+  color: var(--text);
+  background: var(--surface);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--r-md);
+  padding: 11px 13px;
+  transition: border-color .16s, box-shadow .16s;
+}
+
+.textarea { resize: vertical; line-height: 1.6; }
+
+.input::placeholder, .textarea::placeholder { color: var(--text-muted); }
+
+.input:focus, .select:focus, .textarea:focus {
+  outline: none;
+  border-color: var(--cas-navy);
+  box-shadow: 0 0 0 3px rgba(14,18,64,.09);
+}
+
+.select {
+  -webkit-appearance: none;
+  appearance: none;
+  padding-right: 38px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23565D7E' stroke-width='2.2' stroke-linecap='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+}
+
+.field-row { display: grid; grid-template-columns: 1fr 1fr; gap: var(--s-3); }
+
+/* ==========================================================================
+   Botones
+   ========================================================================== */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--s-2);
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 700;
+  padding: 11px 20px;
+  border-radius: var(--r-md);
+  border: 1px solid transparent;
+  cursor: pointer;
+  text-decoration: none;
+  transition: background .18s, border-color .18s, color .18s, box-shadow .18s;
+}
+.btn svg { width: 16px; height: 16px; }
+
+.btn--primary { background: var(--cas-navy); color: #fff; box-shadow: var(--shadow-sm); }
+.btn--primary:hover { background: var(--cas-navy-soft); }
+
+.btn--block { width: 100%; }
+
+.btn--quiet {
+  background: var(--surface);
+  color: var(--text-2);
+  border-color: var(--border-strong);
+  font-size: 13px;
+  padding: 8px 14px;
+}
+.btn--quiet:hover { border-color: var(--cas-navy); color: var(--cas-navy); }
+
+.btn--done {
+  background: var(--success-pale);
+  color: var(--success);
+  border-color: rgba(31,122,92,.28);
+  font-size: 13px;
+  padding: 8px 14px;
+}
+.btn--done:hover { background: #D9EDE5; }
+
+.btn--icon {
+  padding: 9px;
+  background: var(--surface);
+  border-color: var(--border-strong);
+  color: var(--text-muted);
+}
+.btn--icon:hover { background: var(--error-pale); border-color: rgba(200,16,46,.3); color: var(--cas-red); }
+
+/* ==========================================================================
+   Etiquetas de tipo de deber
+   ========================================================================== */
+
+.tag {
+  display: inline-flex;
+  align-items: center;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .04em;
+  padding: 3px 9px;
+  border-radius: var(--r-sm);
+  border: 1px solid;
+}
+.tag--examen          { background: var(--error-pale);   color: #8E0B20; border-color: rgba(200,16,46,.24); }
+.tag--proyecto        { background: var(--info-pale);    color: #2C3D80; border-color: rgba(59,79,158,.22); }
+.tag--extracurricular { background: var(--success-pale); color: #14573F; border-color: rgba(31,122,92,.24); }
+.tag--tarea           { background: #F0EEE3;             color: #6B6438; border-color: rgba(166,161,129,.4); }
+
+/* ==========================================================================
+   Lista de deberes
+   ========================================================================== */
+
+.task {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s-4);
+  padding: var(--s-4) var(--s-5);
+  border-bottom: 1px solid var(--border);
+  transition: background .16s;
+}
+.task:last-child { border-bottom: 0; }
+.task:hover { background: var(--surface-sunk); }
+
+.task__main { min-width: 0; }
+.task__meta { display: flex; align-items: center; gap: var(--s-2); flex-wrap: wrap; margin-bottom: 5px; }
+.task__subject { font-size: 12px; font-weight: 600; color: var(--text-2); }
+.task__title { font-size: 15px; font-weight: 700; color: var(--text); }
+.task__notes {
+  font-size: 13px; color: var(--text-2); margin: 3px 0 0;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.task__due { font-size: 12px; font-weight: 600; color: var(--text-2); margin-top: 5px; }
+.task__due strong { color: var(--cas-navy); font-variant-numeric: tabular-nums; }
+.task__due--soon strong { color: var(--cas-red); }
+
+.task__actions { display: flex; align-items: center; gap: var(--s-2); flex-shrink: 0; }
+.task__actions form { margin: 0; }
+
+@media (max-width: 620px) {
+  .task { flex-direction: column; align-items: stretch; gap: var(--s-3); }
+  .task__actions { justify-content: flex-start; }
+}
+
+.empty {
+  padding: var(--s-7) var(--s-5);
+  text-align: center;
+  color: var(--text-2);
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+.empty__title { font-family: var(--font-display); font-size: 17px; color: var(--text); margin: 0 0 6px; }
+.empty p { margin: 0; font-size: 14px; }
+
+/* ==========================================================================
+   Rejillas
+   ========================================================================== */
+
+.stack { display: flex; flex-direction: column; gap: var(--s-5); }
+
+.split {
+  display: grid;
+  grid-template-columns: minmax(0, 340px) minmax(0, 1fr);
+  gap: var(--s-5);
+  align-items: start;
+}
+.split--even { grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: stretch; }
+.split--even > .card { display: flex; flex-direction: column; }
+.split--even .plan-scroll { flex: 1; }
+
+@media (max-width: 940px) {
+  .split, .split--even { grid-template-columns: minmax(0, 1fr); }
+}
+
+/* ==========================================================================
+   Acceso (login / registro)
+   ========================================================================== */
+
+.auth {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--s-6) var(--s-4);
+  background:
+    radial-gradient(900px 420px at 50% -10%, #E6EAF6 0%, rgba(230,234,246,0) 70%),
+    var(--bg);
+}
+
+.auth__card {
+  width: 100%;
+  max-width: 430px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-top: 3px solid var(--cas-brass);
+  border-radius: var(--r-xl);
+  box-shadow: var(--shadow-lg);
+  padding: var(--s-6) var(--s-6) var(--s-5);
+}
+
+.auth__crest { width: 76px; height: 76px; display: block; margin: 0 auto var(--s-4); }
+
+.auth__head { text-align: center; margin-bottom: var(--s-6); }
+
+.auth__title {
+  font-family: var(--font-display);
+  font-size: 27px;
+  font-weight: 600;
+  letter-spacing: -0.025em;
+}
+
+.auth__school {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: .13em;
+  text-transform: uppercase;
+  color: var(--cas-brass);
+  margin: var(--s-2) 0 0;
+}
+
+.auth__motto {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 13px;
+  color: var(--text-2);
+  margin: 5px 0 0;
+}
+
+.auth__alt { text-align: center; font-size: 13px; color: var(--text-2); margin: var(--s-5) 0 0; }
+.auth__alt a { color: var(--cas-navy); font-weight: 700; text-decoration: none; }
+.auth__alt a:hover { text-decoration: underline; }
+
+.auth__foot {
+  margin-top: var(--s-5);
+  font-size: 11px;
+  letter-spacing: .06em;
+  color: var(--text-muted);
+  text-align: center;
+}
+
+@media (max-width: 460px) {
+  .auth__card { padding: var(--s-5) var(--s-4) var(--s-4); }
+  .auth__crest { width: 64px; height: 64px; }
+}
+
+/* ==========================================================================
+   Desglosador IA
+   ========================================================================== */
+
+.plan { padding: var(--s-5); }
+
+.plan__head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--s-4);
+  padding-bottom: var(--s-4);
+  border-bottom: 1px solid var(--border);
+}
+
+.plan__title { font-family: var(--font-display); font-size: 21px; font-weight: 600; letter-spacing: -0.02em; margin-top: 3px; }
+
+.effort {
+  flex-shrink: 0;
+  text-align: center;
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  padding: 7px 13px;
+  background: var(--surface-sunk);
+}
+.effort__val { font-family: var(--font-display); font-size: 19px; font-weight: 700; color: var(--cas-navy); font-variant-numeric: tabular-nums; }
+.effort__val span { color: var(--text-muted); font-size: 13px; }
+
+.plan__intro { font-size: 14px; color: var(--text-2); margin: var(--s-4) 0 0; }
+
+.plan__days { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: var(--s-3); margin-top: var(--s-3); }
+
+.day-card { border: 1px solid var(--border); border-radius: var(--r-md); padding: var(--s-4); background: var(--surface-sunk); }
+.day-card__label { font-size: 11px; font-weight: 700; letter-spacing: .07em; text-transform: uppercase; color: var(--cas-navy); margin-bottom: var(--s-2); }
+.day-card__item { margin-bottom: var(--s-3); }
+.day-card__item:last-child { margin-bottom: 0; }
+.day-card__subject { font-size: 12px; font-weight: 700; color: var(--text); }
+.day-card__task { font-size: 13px; color: var(--text-2); margin: 1px 0 0; }
+
+.technique { border: 1px solid rgba(166,161,129,.45); background: #FBFAF5; border-radius: var(--r-md); padding: var(--s-4); margin-top: var(--s-5); }
+.technique__label { font-size: 11px; font-weight: 700; letter-spacing: .07em; text-transform: uppercase; color: #6B6438; margin-bottom: 5px; }
+.technique p { margin: 0; font-size: 13px; color: var(--text-2); }
+
+.quote {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 15px;
+  color: var(--text-2);
+  text-align: center;
+  margin: var(--s-5) 0 0;
+  padding-top: var(--s-5);
+  border-top: 1px solid var(--border);
+}
+
+.plan-scroll { max-height: 620px; overflow-y: auto; }
+
+.section-label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .09em;
+  text-transform: uppercase;
+  color: var(--text-2);
+  margin: var(--s-5) 0 0;
+  display: flex;
+  align-items: center;
+  gap: var(--s-2);
+}
+.section-label::after { content: ""; flex: 1; height: 1px; background: var(--border); }
+
+/* ==========================================================================
+   Selección de actividades del plan para llevarlas al panel
+   ========================================================================== */
+
+.pick {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--s-2);
+  cursor: pointer;
+  padding: 5px 6px;
+  margin: 0 -6px var(--s-2);
+  border-radius: var(--r-sm);
+  transition: background .16s;
+}
+.pick:last-child { margin-bottom: 0; }
+.pick:hover { background: rgba(14,18,64,.04); }
+
+.pick__box {
+  -webkit-appearance: none;
+  appearance: none;
+  flex-shrink: 0;
+  width: 16px;
+  height: 16px;
+  margin: 2px 0 0;
+  border: 1.5px solid var(--border-strong);
+  border-radius: 4px;
+  background: var(--surface);
+  cursor: pointer;
+  transition: background .16s, border-color .16s;
+}
+.pick__box:checked {
+  background: var(--cas-navy);
+  border-color: var(--cas-navy);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='3.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M20 6L9 17l-5-5'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: center;
+}
+.pick:has(.pick__box:not(:checked)) { opacity: .5; }
+
+.pick .day-card__subject,
+.pick .day-card__task { display: block; }
+
+.plan__import {
+  display: flex;
+  align-items: center;
+  gap: var(--s-4);
+  flex-wrap: wrap;
+  margin-top: var(--s-5);
+  padding-top: var(--s-5);
+  border-top: 1px solid var(--border);
+}
+
+.plan__import-note { margin: 0; font-size: 12px; color: var(--text-muted); flex: 1; min-width: 180px; }
+
+/* ==========================================================================
+   Deberes vencidos
+   Un riel rojo a la izquierda los separa del resto sin gritar.
+   ========================================================================== */
+
+.task--overdue {
+  background: linear-gradient(to right, var(--cas-red-pale), transparent 60%);
+  box-shadow: inset 3px 0 0 var(--cas-red);
+}
+.task--overdue:hover { background: linear-gradient(to right, #F8DDE2, transparent 60%); }
+
+.tag--vencido {
+  background: var(--cas-red);
+  color: #fff;
+  border-color: var(--cas-red);
+  letter-spacing: .03em;
+}
+
+.eyebrow--alert { color: var(--cas-red); }
