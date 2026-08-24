@@ -743,3 +743,57 @@ a { color: inherit; }
   gap: var(--s-2);
 }
 .section-label::after { content: ""; flex: 1; height: 1px; background: var(--border); }
+
+/* ==========================================================================
+   Selección de actividades del plan para llevarlas al panel
+   ========================================================================== */
+
+.pick {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--s-2);
+  cursor: pointer;
+  padding: 5px 6px;
+  margin: 0 -6px var(--s-2);
+  border-radius: var(--r-sm);
+  transition: background .16s;
+}
+.pick:last-child { margin-bottom: 0; }
+.pick:hover { background: rgba(14,18,64,.04); }
+
+.pick__box {
+  -webkit-appearance: none;
+  appearance: none;
+  flex-shrink: 0;
+  width: 16px;
+  height: 16px;
+  margin: 2px 0 0;
+  border: 1.5px solid var(--border-strong);
+  border-radius: 4px;
+  background: var(--surface);
+  cursor: pointer;
+  transition: background .16s, border-color .16s;
+}
+.pick__box:checked {
+  background: var(--cas-navy);
+  border-color: var(--cas-navy);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='3.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M20 6L9 17l-5-5'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: center;
+}
+.pick:has(.pick__box:not(:checked)) { opacity: .5; }
+
+.pick .day-card__subject,
+.pick .day-card__task { display: block; }
+
+.plan__import {
+  display: flex;
+  align-items: center;
+  gap: var(--s-4);
+  flex-wrap: wrap;
+  margin-top: var(--s-5);
+  padding-top: var(--s-5);
+  border-top: 1px solid var(--border);
+}
+
+.plan__import-note { margin: 0; font-size: 12px; color: var(--text-muted); flex: 1; min-width: 180px; }
