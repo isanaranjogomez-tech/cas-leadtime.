@@ -46,19 +46,36 @@
                 <p class="plan__intro">{{ days_plan.intro }}</p>
 
                 <p class="section-label">Cronograma</p>
-                <div class="plan__days">
-                    {% for day in days_plan.days %}
-                    <div class="day-card">
-                        <p class="day-card__label">Día {{ day.day_number }} · {{ day.day_title }}</p>
-                        {% for item in day.tasks %}
-                        <div class="day-card__item">
-                            <p class="day-card__subject">{{ item.subject }}</p>
-                            <p class="day-card__task">{{ item.task }}</p>
+                <form method="POST" action="{{ url_for('import_plan') }}">
+                    <input type="hidden" name="plan_json" value="{{ days_plan|tojson }}">
+
+                    <div class="plan__days">
+                        {% for day in days_plan.days %}
+                        {% set d_idx = loop.index0 %}
+                        <div class="day-card">
+                            <p class="day-card__label">Día {{ day.day_number }} · {{ day.day_title }}</p>
+                            {% for item in day.tasks %}
+                            <label class="day-card__item pick">
+                                <input class="pick__box" type="checkbox" name="seleccion"
+                                       value="{{ d_idx }}-{{ loop.index0 }}" checked>
+                                <span>
+                                    <span class="day-card__subject">{{ item.subject }}</span>
+                                    <span class="day-card__task">{{ item.task }}</span>
+                                </span>
+                            </label>
+                            {% endfor %}
                         </div>
                         {% endfor %}
                     </div>
-                    {% endfor %}
-                </div>
+
+                    <div class="plan__import">
+                        <button class="btn btn--primary" type="submit">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                            Añadir al panel
+                        </button>
+                        <p class="plan__import-note">Cada día se agenda a partir de hoy. Desmarca lo que no quieras.</p>
+                    </div>
+                </form>
 
                 <div class="technique">
                     <p class="technique__label">Técnica recomendada · {{ days_plan.technique_title }}</p>
