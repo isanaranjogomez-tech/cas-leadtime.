@@ -114,11 +114,21 @@
         <section class="card">
             <div class="card__head">
                 <h2 class="card__title">Tus pendientes</h2>
-                {% if overdue_count %}
-                <span class="eyebrow eyebrow--alert num">{{ overdue_count }} vencido{{ 's' if overdue_count != 1 }} · {{ tasks|length }} activo{{ 's' if tasks|length != 1 }}</span>
-                {% else %}
-                <span class="eyebrow num">{{ tasks|length }} activo{{ 's' if tasks|length != 1 }}</span>
-                {% endif %}
+                <div class="card__head-actions">
+                    {% if tasks %}
+                    <form method="POST" action="{{ url_for('organize_week') }}">
+                        <button class="btn btn--quiet" type="submit">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M5.6 18.4l2.1-2.1M16.3 7.7l2.1-2.1"/><circle cx="12" cy="12" r="3"/></svg>
+                            Organizar mi semana
+                        </button>
+                    </form>
+                    {% endif %}
+                    {% if overdue_count %}
+                    <span class="eyebrow eyebrow--alert num">{{ overdue_count }} vencido{{ 's' if overdue_count != 1 }} · {{ tasks|length }} activo{{ 's' if tasks|length != 1 }}</span>
+                    {% else %}
+                    <span class="eyebrow num">{{ tasks|length }} activo{{ 's' if tasks|length != 1 }}</span>
+                    {% endif %}
+                </div>
             </div>
 
             {% if tasks %}
@@ -166,5 +176,44 @@
         </section>
 
     </div>
+
+    {% if done_tasks %}
+    <section class="card">
+        <details class="done">
+            <summary class="done__head">
+                <span class="card__title">Completados</span>
+                <span class="eyebrow num">{{ done_tasks|length }}</span>
+                <svg class="done__chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
+            </summary>
+            <div class="done__list">
+                {% for task in done_tasks %}
+                <article class="task task--done">
+                    <div class="task__main">
+                        <div class="task__meta">
+                            <span class="tag tag--{{ task.type|lower }}">{{ task.type }}</span>
+                            <span class="task__subject">{{ task.subject }}</span>
+                        </div>
+                        <h3 class="task__title">{{ task.title }}</h3>
+                        <p class="task__due">Vencía <strong>{{ task.due_date|fecha }}</strong></p>
+                    </div>
+                    <div class="task__actions">
+                        <form action="{{ url_for('reopen_task', task_id=task.id) }}" method="POST">
+                            <button class="btn btn--quiet" type="submit">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/></svg>
+                                Reabrir
+                            </button>
+                        </form>
+                        <form action="{{ url_for('delete_task', task_id=task.id) }}" method="POST">
+                            <button class="btn btn--icon" type="submit" title="Eliminar deber" aria-label="Eliminar deber">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                            </button>
+                        </form>
+                    </div>
+                </article>
+                {% endfor %}
+            </div>
+        </details>
+    </section>
+    {% endif %}
 </div>
 {% endblock %}
