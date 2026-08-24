@@ -288,6 +288,65 @@ def ai_tutor():
     return render_template('ai_tutor.html', ai_response=ai_response, days_plan=days_plan, raw_input=raw_input)
 
 
+@app.route('/ai-tutor/importar', methods=['POST'])
+@login_required
+def import_plan():
+    """Convierte los ítems seleccionados de un plan generado en deberes reales."""
+    selected = request.form.getlist('seleccion')
+    if not selected:
+        flash('No seleccionaste ninguna actividad del plan.', 'error')
+        return redirect(url_for('ai_tutor'))
+
+    try:
+        plan = json.loads(request.form.get('plan_json', ''))
+        days = plan.get('days', [])
+    except (ValueError, AttributeError):
+        flash('No se pudo leer el plan. Genéralo de nuevo.', 'error')
+        return redirect(url_for('ai_tutor'))
+
+    today = datetime.now().date()
+    created = 0
+
+    for ref in selected:
+        try:
+            d_idx, t_idx = (int(n) for n in ref.split('-'))
+            item = days[d_idx]['tasks'][t_idx]
+        except (ValueError, IndexError, KeyError, TypeError):
+            continue
+
+        # "Día 1" es hoy, "Día 2" mañana, y así sucesivamente.
+        try:
+            offset = max(int(days[d_idx].get('day_number', d_idx + 1)) - 1, 0)
+        except (ValueError, TypeError):
+            offset = d_idx
+
+        subject = (item.get('subject') or '').strip()
+        # Respetamos la materia sugerida solo si existe en la lista del colegio.
+        match = next((s for s in SUBJECTS if s.lower() == subject.lower()), None)
+
+        title = (item.get('task') or '').strip()
+        if not title:
+            continue
+
+        db.session.add(Task(
+            title=title[:200],
+            subject=match or subject[:100] or SUBJECTS[0],
+            type='Tarea',
+            due_date=today + timedelta(days=offset),
+            notes=f"Generado por el Desglosador IA · {plan.get('title', 'Plan de trabajo')}",
+            user_id=current_user.id,
+        ))
+        created += 1
+
+    if not created:
+        flash('No se pudo añadir ninguna actividad del plan.', 'error')
+        return redirect(url_for('ai_tutor'))
+
+    db.session.commit()
+    flash(f"{created} actividad{'es' if created > 1 else ''} añadida{'s' if created > 1 else ''} a tu panel.", 'success')
+    return redirect(url_for('dashboard'))
+
+
 with app.app_context():
     db.create_all()
 
