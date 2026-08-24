@@ -217,8 +217,11 @@ def dashboard():
     today = datetime.now().date()
     overdue_count = sum(1 for t in tasks if t.due_date < today)
 
+    done_tasks = Task.query.filter_by(user_id=current_user.id, completed=True)\
+        .order_by(Task.due_date.desc()).limit(15).all()
+
     return render_template('dashboard.html', tasks=tasks, radar=radar, today=today,
-                            overdue_count=overdue_count,
+                            overdue_count=overdue_count, done_tasks=done_tasks,
                             alerts=critical_alerts, subjects=SUBJECTS, task_types=TASK_TYPES)
 
 
@@ -229,6 +232,18 @@ def complete_task(task_id):
     if task and task.user_id == current_user.id:
         task.completed = True
         db.session.commit()
+        flash(f'"{task.title}" completado. Puedes reabrirlo desde "Completados".', 'success')
+    return redirect(url_for('dashboard'))
+
+
+@app.route('/reabrir/<int:task_id>', methods=['POST'])
+@login_required
+def reopen_task(task_id):
+    task = db.session.get(Task, task_id)
+    if task and task.user_id == current_user.id:
+        task.completed = False
+        db.session.commit()
+        flash(f'"{task.title}" volvió a tus pendientes.', 'success')
     return redirect(url_for('dashboard'))
 
 
@@ -243,6 +258,45 @@ def delete_task(task_id):
 
 
 # ---- IA: DESGLOSADOR ----
+def generate_plan(raw_input):
+    """Pide el plan a Groq. Devuelve (days_plan, mensaje_de_error)."""
+    if not groq_client:
+        return None, ("<p>No hay una API Key de Groq configurada en este entorno. Define la "
+                      "variable de entorno GROQ_API_KEY para activar el Desglosador IA.</p>")
+
+    system_prompt = (
+        "Actúas como un tutor experto en productividad y organización académica para el "
+        "Colegio Colombo Americano (CAS). El usuario te va a pasar un texto confuso o largo con "
+        "una o múltiples tareas escolares. Analízalo y responde ÚNICAMENTE con un objeto JSON "
+        "válido (sin texto antes o después, sin ```json, sin comentarios), con exactamente esta "
+        "forma:\n"
+        '{"subtitle": "COLEGIO COLOMBO AMERICANO", "title": "título corto y sofisticado del plan '
+        '(máx 6 palabras)", "intro": "1-2 frases explicando el volumen de trabajo y el enfoque '
+        'elegido", "effort_level": <entero 1-5>, "days": [{"day_number": <entero>, "day_title": '
+        '"título corto del enfoque de ese día (máx 5 palabras)", "tasks": [{"subject": "materia", '
+        '"task": "qué hacer exactamente, concreto y accionable"}]}], "technique_title": "nombre de '
+        'la técnica de estudio recomendada", "technique_description": "1-3 frases explicando cómo '
+        'aplicarla a este caso específico", "closing_quote": "frase corta, motivacional, '
+        'sofisticada y con liderazgo"}\n'
+        "Distribuye el trabajo en máximo 5 días. Sé específico y concreto en cada tarea, evita "
+        "generalidades. El intro y closing_quote deben sonar elegantes y con autoridad."
+    )
+    try:
+        completion = groq_client.chat.completions.create(
+            model="openai/gpt-oss-120b",
+            messages=[
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": f"Texto del estudiante:\n{raw_input}"},
+            ],
+            temperature=0.6,
+            max_tokens=2000,
+            response_format={"type": "json_object"},
+        )
+        return json.loads(completion.choices[0].message.content), None
+    except Exception as e:
+        return None, f"<p>Error al generar el plan con Groq: {str(e)}</p>"
+
+
 @app.route('/ai-tutor', methods=['GET', 'POST'])
 @login_required
 def ai_tutor():
@@ -251,45 +305,44 @@ def ai_tutor():
     raw_input = ""
     if request.method == 'POST':
         raw_input = request.form.get('raw_input', '')
-
-        if not groq_client:
-            ai_response = ("<p>No hay una API Key de Groq configurada en este entorno. Define la "
-                            "variable de entorno GROQ_API_KEY para activar el Desglosador IA.</p>")
-        else:
-            system_prompt = (
-                "Actúas como un tutor experto en productividad y organización académica para el "
-                "Colegio Colombo Americano (CAS). El usuario te va a pasar un texto confuso o largo con "
-                "una o múltiples tareas escolares. Analízalo y responde ÚNICAMENTE con un objeto JSON "
-                "válido (sin texto antes o después, sin ```json, sin comentarios), con exactamente esta "
-                "forma:\n"
-                '{"subtitle": "COLEGIO COLOMBO AMERICANO", "title": "título corto y sofisticado del plan '
-                '(máx 6 palabras)", "intro": "1-2 frases explicando el volumen de trabajo y el enfoque '
-                'elegido", "effort_level": <entero 1-5>, "days": [{"day_number": <entero>, "day_title": '
-                '"título corto del enfoque de ese día (máx 5 palabras)", "tasks": [{"subject": "materia", '
-                '"task": "qué hacer exactamente, concreto y accionable"}]}], "technique_title": "nombre de '
-                'la técnica de estudio recomendada", "technique_description": "1-3 frases explicando cómo '
-                'aplicarla a este caso específico", "closing_quote": "frase corta, motivacional, '
-                'sofisticada y con liderazgo"}\n'
-                "Distribuye el trabajo en máximo 5 días. Sé específico y concreto en cada tarea, evita "
-                "generalidades. El intro y closing_quote deben sonar elegantes y con autoridad."
-            )
-            try:
-                completion = groq_client.chat.completions.create(
-                    model="openai/gpt-oss-120b",
-                    messages=[
-                        {"role": "system", "content": system_prompt},
-                        {"role": "user", "content": f"Texto del estudiante:\n{raw_input}"},
-                    ],
-                    temperature=0.6,
-                    max_tokens=2000,
-                    response_format={"type": "json_object"},
-                )
-                raw_json = completion.choices[0].message.content
-                days_plan = json.loads(raw_json)
-            except Exception as e:
-                ai_response = f"<p>Error al generar el plan con Groq: {str(e)}</p>"
+        days_plan, ai_response = generate_plan(raw_input)
 
     return render_template('ai_tutor.html', ai_response=ai_response, days_plan=days_plan, raw_input=raw_input)
+
+
+@app.route('/organizar-semana', methods=['POST'])
+@login_required
+def organize_week():
+    """Toma los pendientes del panel y se los pasa al Desglosador."""
+    pending = Task.query.filter_by(user_id=current_user.id, completed=False)\
+        .order_by(Task.due_date).all()
+
+    if not pending:
+        flash('No tienes deberes pendientes para organizar.', 'error')
+        return redirect(url_for('dashboard'))
+
+    today = datetime.now().date()
+    lineas = ["Estos son mis deberes pendientes. Organízame un plan de estudio."]
+    for t in pending:
+        dias = (t.due_date - today).days
+        if dias < 0:
+            cuando = f"VENCIDO hace {abs(dias)} día(s)"
+        elif dias == 0:
+            cuando = "vence HOY"
+        elif dias == 1:
+            cuando = "vence mañana"
+        else:
+            cuando = f"vence en {dias} días"
+        linea = f"- [{t.type}] {t.subject}: {t.title} ({cuando}, {format_date_es(t.due_date)})"
+        if t.notes:
+            linea += f" Notas: {t.notes}"
+        lineas.append(linea)
+
+    raw_input = "\n".join(lineas)
+    days_plan, ai_response = generate_plan(raw_input)
+
+    return render_template('ai_tutor.html', ai_response=ai_response,
+                           days_plan=days_plan, raw_input=raw_input)
 
 
 @app.route('/ai-tutor/importar', methods=['POST'])
