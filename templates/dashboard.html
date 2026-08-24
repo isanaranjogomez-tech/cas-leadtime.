@@ -1,157 +1,158 @@
 {% extends 'base.html' %}
+{% block title %}Mis deberes · CAS LeadTime AI{% endblock %}
 
 {% block content %}
-<div class="max-w-6xl mx-auto space-y-8">
+<div class="page-head">
+    <h1>Panel académico</h1>
+    <p>Hola, {{ current_user.username }}. Así se ve tu semana.</p>
+</div>
 
-    <div class="flex items-end justify-between">
-        <div>
-            <h2 class="font-display text-4xl font-semibold text-white">Panel Académico</h2>
-            <p class="text-sm text-muted mt-1">Hola, {{ current_user.username }}. Así se ve tu semana.</p>
-        </div>
-    </div>
+<div class="stack">
 
-    <!-- RADAR DE CARGA SEMANAL -->
-    <div class="bg-surface p-6 rounded-2xl border border-white/5">
-        <div class="flex items-center justify-between mb-5">
-            <h3 class="text-sm font-semibold uppercase tracking-wider text-muted">Radar de Carga · Próximos 7 días</h3>
-            <div class="flex items-center gap-4 text-[11px] text-muted">
-                <span class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-ok"></span>Libre</span>
-                <span class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-gold"></span>Moderado</span>
-                <span class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-danger"></span>Crítico</span>
+    <!-- BITÁCORA DE LA SEMANA -->
+    <section class="card">
+        <div class="card__head">
+            <h2 class="card__title">Bitácora de la semana</h2>
+            <div class="legend">
+                <span><i style="background: var(--cas-red)"></i>Examen</span>
+                <span><i style="background: var(--info); opacity: .75"></i>Entrega</span>
             </div>
         </div>
-        <div class="grid grid-cols-7 gap-3">
-            {% for day in radar %}
-            <div class="relative rounded-xl p-3 border transition-all
-                {% if day.level == 'critico' %} bg-danger/10 border-danger/30
-                {% elif day.level == 'medio' %} bg-gold/10 border-gold/30
-                {% elif day.level == 'bajo' %} bg-info/10 border-info/20
-                {% else %} bg-white/[0.02] border-white/5
-                {% endif %}
-                {% if day.is_today %} ring-1 ring-white/20 {% endif %}">
-                <p class="text-[10px] uppercase tracking-wider text-muted mb-1">{{ day.label }}{% if day.is_today %} · hoy{% endif %}</p>
-                <p class="font-display text-xl font-semibold text-white mb-2">{{ day.day_num }}</p>
-                <div class="space-y-1">
-                    {% if day.exams %}
-                    <p class="text-[11px] font-semibold text-danger">{{ day.exams }} examen{{ 'es' if day.exams > 1 else '' }}</p>
-                    {% endif %}
-                    {% if day.tasks %}
-                    <p class="text-[11px] text-muted">{{ day.tasks }} entrega{{ 's' if day.tasks > 1 else '' }}</p>
-                    {% endif %}
-                    {% if not day.exams and not day.tasks %}
-                    <p class="text-[11px] text-muted/50">—</p>
+        <div class="card__body">
+            <div class="ledger">
+                {% for day in radar %}
+                <div class="ledger__day
+                    {%- if day.is_today %} ledger__day--today
+                    {%- elif day.level == 'critico' %} ledger__day--critical
+                    {%- elif day.level == 'medio' %} ledger__day--medium{% endif %}">
+
+                    <p class="ledger__dow">{{ day.label }}{% if day.is_today %} · hoy{% endif %}</p>
+                    <p class="ledger__date">{{ day.day_num }}</p>
+
+                    <div class="ledger__marks">
+                        {% for _ in range(day.exams if day.exams < 5 else 5) %}
+                        <span class="ledger__mark ledger__mark--exam"></span>
+                        {% endfor %}
+                        {% for _ in range(day.tasks if day.tasks < 7 else 7) %}
+                        <span class="ledger__mark ledger__mark--task"></span>
+                        {% endfor %}
+                    </div>
+
+                    <div class="ledger__rule"></div>
+
+                    {% if day.exams or day.tasks %}
+                    <p class="ledger__count num">
+                        {%- if day.exams %}{{ day.exams }} examen{{ 'es' if day.exams > 1 }}{% endif -%}
+                        {%- if day.exams and day.tasks %} · {% endif -%}
+                        {%- if day.tasks %}{{ day.tasks }} entrega{{ 's' if day.tasks > 1 }}{% endif -%}
+                    </p>
+                    {% else %}
+                    <p class="ledger__count ledger__count--empty">Sin pendientes</p>
                     {% endif %}
                 </div>
+                {% endfor %}
             </div>
-            {% endfor %}
         </div>
-    </div>
+    </section>
 
     {% if alerts %}
-    <div class="space-y-2">
+    <div class="notice-stack" style="margin-bottom: 0">
         {% for alert in alerts %}
-        <div class="bg-danger/10 border border-danger/25 p-4 rounded-xl text-danger text-sm flex items-center space-x-3">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="shrink-0"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+        <div class="notice notice--error">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
             <span>Día de alta carga — {{ alert }}</span>
         </div>
         {% endfor %}
     </div>
     {% endif %}
 
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+    <div class="split">
 
-        <!-- FORMULARIO -->
-        <div class="bg-surface p-6 rounded-2xl border border-white/5 h-fit">
-            <h3 class="text-lg font-display font-semibold text-white mb-5">Añadir Deber</h3>
-            <form method="POST" class="space-y-4">
-                <div>
-                    <label class="block text-xs font-semibold text-muted uppercase mb-1.5">Título</label>
-                    <input type="text" name="title" required placeholder="ej. Ensayo de Global Perspectives" class="w-full bg-deep border border-white/10 rounded-xl p-3 text-sm text-ink focus:outline-none focus:border-gold/60 focus:ring-2 focus:ring-gold/10 transition-all">
-                </div>
+        <!-- AÑADIR DEBER -->
+        <section class="card">
+            <div class="card__head"><h2 class="card__title">Añadir un deber</h2></div>
+            <div class="card__body">
+                <form method="POST">
+                    <div class="field">
+                        <label for="title">Título</label>
+                        <input class="input" id="title" type="text" name="title" required
+                               placeholder="Ensayo de Global Perspectives">
+                    </div>
 
-                <div>
-                    <label class="block text-xs font-semibold text-muted uppercase mb-1.5">Materia</label>
-                    <select name="subject" class="w-full bg-deep border border-white/10 rounded-xl p-3 text-sm text-ink focus:outline-none focus:border-gold/60 transition-all">
-                        {% for s in subjects %}
-                        <option value="{{ s }}">{{ s }}</option>
-                        {% endfor %}
-                    </select>
-                </div>
-
-                <div class="grid grid-cols-2 gap-3">
-                    <div>
-                        <label class="block text-xs font-semibold text-muted uppercase mb-1.5">Tipo</label>
-                        <select name="type" class="w-full bg-deep border border-white/10 rounded-xl p-3 text-sm text-ink focus:outline-none focus:border-gold/60 transition-all">
-                            {% for t in task_types %}
-                            <option value="{{ t }}">{{ t }}</option>
-                            {% endfor %}
+                    <div class="field">
+                        <label for="subject">Materia</label>
+                        <select class="select" id="subject" name="subject">
+                            {% for s in subjects %}<option value="{{ s }}">{{ s }}</option>{% endfor %}
                         </select>
                     </div>
 
-                    <div>
-                        <label class="block text-xs font-semibold text-muted uppercase mb-1.5">Entrega</label>
-                        <input type="date" name="due_date" required class="w-full bg-deep border border-white/10 rounded-xl p-3 text-sm text-ink focus:outline-none focus:border-gold/60 transition-all">
+                    <div class="field-row">
+                        <div class="field">
+                            <label for="type">Tipo</label>
+                            <select class="select" id="type" name="type">
+                                {% for t in task_types %}<option value="{{ t }}">{{ t }}</option>{% endfor %}
+                            </select>
+                        </div>
+                        <div class="field">
+                            <label for="due_date">Entrega</label>
+                            <input class="input" id="due_date" type="date" name="due_date" required>
+                        </div>
                     </div>
-                </div>
 
-                <div>
-                    <label class="block text-xs font-semibold text-muted uppercase mb-1.5">Notas</label>
-                    <textarea name="notes" rows="3" placeholder="Detalles, criterios, recordatorios..." class="w-full bg-deep border border-white/10 rounded-xl p-3 text-sm text-ink focus:outline-none focus:border-gold/60 focus:ring-2 focus:ring-gold/10 transition-all resize-none"></textarea>
-                </div>
+                    <div class="field">
+                        <label for="notes">Notas</label>
+                        <textarea class="textarea" id="notes" name="notes" rows="3"
+                                  placeholder="Criterios, formato, recordatorios..."></textarea>
+                    </div>
 
-                <button type="submit" class="w-full bg-gradient-to-r from-gold to-gold-soft hover:brightness-110 text-deep font-bold py-3 rounded-xl shadow-lg shadow-gold/10 transition-all">
-                    Guardar Deber
-                </button>
-            </form>
-        </div>
+                    <button class="btn btn--primary btn--block" type="submit">Guardar deber</button>
+                </form>
+            </div>
+        </section>
 
-        <!-- LISTA -->
-        <div class="lg:col-span-2 space-y-3">
-            <h3 class="text-lg font-display font-semibold text-white mb-2">Tus Pendientes</h3>
+        <!-- PENDIENTES -->
+        <section class="card">
+            <div class="card__head">
+                <h2 class="card__title">Tus pendientes</h2>
+                <span class="eyebrow num">{{ tasks|length }} activo{{ 's' if tasks|length != 1 }}</span>
+            </div>
 
             {% if tasks %}
                 {% for task in tasks %}
-                <div class="bg-surface p-5 rounded-2xl border border-white/5 hover:border-white/10 transition-colors flex items-center justify-between gap-4">
-                    <div class="space-y-1.5 min-w-0">
-                        <div class="flex items-center space-x-2.5 flex-wrap gap-y-1">
-                            <span class="text-[11px] font-semibold px-2.5 py-1 rounded-md
-                                {% if task.type == 'Examen' %} bg-danger/15 text-danger border border-danger/25
-                                {% elif task.type == 'Proyecto' %} bg-info/15 text-info border border-info/25
-                                {% elif task.type == 'Extracurricular' %} bg-ok/15 text-ok border border-ok/25
-                                {% else %} bg-gold/15 text-gold border border-gold/25 {% endif %}">
-                                {{ task.type }}
-                            </span>
-                            <span class="text-xs text-muted font-medium">{{ task.subject }}</span>
+                <article class="task">
+                    <div class="task__main">
+                        <div class="task__meta">
+                            <span class="tag tag--{{ task.type|lower }}">{{ task.type }}</span>
+                            <span class="task__subject">{{ task.subject }}</span>
                         </div>
-                        <h4 class="text-base font-semibold text-white truncate">{{ task.title }}</h4>
-                        {% if task.notes %}
-                        <p class="text-xs text-muted line-clamp-1">{{ task.notes }}</p>
-                        {% endif %}
-                        <p class="text-xs text-gold font-medium">Entrega: {{ task.due_date.strftime('%b %d, %Y') }}</p>
+                        <h3 class="task__title">{{ task.title }}</h3>
+                        {% if task.notes %}<p class="task__notes">{{ task.notes }}</p>{% endif %}
+                        <p class="task__due">Entrega <strong>{{ task.due_date|fecha }}</strong></p>
                     </div>
 
-                    <div class="flex items-center gap-2 shrink-0">
+                    <div class="task__actions">
                         <form action="{{ url_for('complete_task', task_id=task.id) }}" method="POST">
-                            <button type="submit" class="bg-ok/10 hover:bg-ok/20 text-ok border border-ok/25 px-4 py-2 rounded-xl text-xs font-bold transition-colors">
+                            <button class="btn btn--done" type="submit">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg>
                                 Completar
                             </button>
                         </form>
                         <form action="{{ url_for('delete_task', task_id=task.id) }}" method="POST">
-                            <button type="submit" class="bg-white/[0.03] hover:bg-danger/15 text-muted hover:text-danger border border-white/10 hover:border-danger/25 p-2 rounded-xl transition-colors" title="Eliminar">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                            <button class="btn btn--icon" type="submit" title="Eliminar deber" aria-label="Eliminar deber">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
                             </button>
                         </form>
                     </div>
-                </div>
+                </article>
                 {% endfor %}
             {% else %}
-                <div class="bg-surface p-10 rounded-2xl border border-white/5 text-center text-muted">
-                    <p>No tienes tareas pendientes. Estás al día.</p>
+                <div class="empty">
+                    <p class="empty__title">La semana está despejada</p>
+                    <p>Añade tu primer deber con el formulario de la izquierda.</p>
                 </div>
             {% endif %}
-        </div>
+        </section>
 
     </div>
-
 </div>
 {% endblock %}

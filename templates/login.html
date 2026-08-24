@@ -1,45 +1,41 @@
 {% extends 'base.html' %}
+{% block title %}Ingresar · CAS LeadTime AI{% endblock %}
 
-{% block content %}
-<div class="min-h-screen w-full flex items-center justify-center p-4 -m-10">
-    <div class="absolute inset-0 overflow-hidden pointer-events-none">
-        <div class="absolute -top-32 -left-32 w-96 h-96 rounded-full bg-gold/5 blur-3xl"></div>
-        <div class="absolute -bottom-32 -right-32 w-96 h-96 rounded-full bg-info/5 blur-3xl"></div>
-    </div>
+{% block body %}
+<main class="auth">
+    <div class="auth__card">
 
-    <div class="relative w-full max-w-md">
-        <div class="w-full bg-surface p-9 rounded-3xl border border-white/5 shadow-2xl shadow-black/40">
-            <div class="text-center mb-9">
-                <div class="w-14 h-14 rounded-full bg-gradient-to-tr from-gold to-gold-soft p-[2px] mx-auto mb-5 flex items-center justify-center shadow-lg shadow-gold/10">
-                    <div class="w-full h-full bg-deep rounded-full flex items-center justify-center">
-                        <span class="text-sm font-bold tracking-widest text-gold">CAS</span>
-                    </div>
-                </div>
-                <h2 class="font-display text-3xl font-semibold text-white">LeadTime AI</h2>
-                <p class="text-xs text-muted mt-2 tracking-wide uppercase">Plataforma de Productividad Académica</p>
+        <div class="auth__head">
+            <img class="auth__crest" src="{{ url_for('static', filename='img/cas-crest.png') }}"
+                 alt="Escudo del Colegio Colombo Americano">
+            <p class="auth__school">Colegio Colombo Americano</p>
+            <h1 class="auth__title">LeadTime AI</h1>
+            <p class="auth__motto">Educating Transformative Leaders</p>
+        </div>
+
+        {% include '_flashes.html' %}
+
+        <form method="POST" novalidate>
+            <div class="field">
+                <label for="email">Correo institucional</label>
+                <input class="input" id="email" type="email" name="email" required
+                       autocomplete="email" placeholder="nombre@colombo.edu.co">
             </div>
 
-            <form method="POST" class="space-y-5">
-                <div>
-                    <label class="block text-xs font-semibold uppercase tracking-wider text-muted mb-2">Correo Institucional</label>
-                    <input type="email" name="email" required autocomplete="email" class="w-full bg-deep border border-white/10 rounded-xl px-4 py-3.5 text-sm text-ink focus:outline-none focus:border-gold/60 focus:ring-2 focus:ring-gold/10 transition-all">
-                </div>
+            <div class="field">
+                <label for="password">Contraseña</label>
+                <input class="input" id="password" type="password" name="password" required
+                       autocomplete="current-password">
+            </div>
 
-                <div>
-                    <label class="block text-xs font-semibold uppercase tracking-wider text-muted mb-2">Contraseña</label>
-                    <input type="password" name="password" required autocomplete="current-password" class="w-full bg-deep border border-white/10 rounded-xl px-4 py-3.5 text-sm text-ink focus:outline-none focus:border-gold/60 focus:ring-2 focus:ring-gold/10 transition-all">
-                </div>
+            <button class="btn btn--primary btn--block" type="submit">Ingresar</button>
+        </form>
 
-                <button type="submit" class="w-full bg-gradient-to-r from-gold to-gold-soft hover:brightness-110 text-deep font-bold py-3.5 rounded-xl shadow-lg shadow-gold/20 transition-all duration-200 mt-2">
-                    Ingresar a LeadTime
-                </button>
-            </form>
+        <p class="auth__alt">
+            ¿Aún no tienes cuenta? <a href="{{ url_for('register') }}">Créala aquí</a>
+        </p>
 
-            <p class="text-center text-xs text-muted mt-7">
-                ¿No tienes cuenta? <a href="{{ url_for('register') }}" class="text-gold font-semibold hover:underline">Regístrate aquí</a>
-            </p>
-        </div>
-        <p class="text-center text-[11px] text-muted/60 mt-6 tracking-wide">Educating Transformative Leaders</p>
     </div>
-</div>
+    <p class="auth__foot">Plataforma de organización académica · CAS</p>
+</main>
 {% endblock %}

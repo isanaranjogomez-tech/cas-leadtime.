@@ -34,6 +34,29 @@ SUBJECTS = ["Math", "Language Arts", "Lenguaje", "Geometría", "Global Perspecti
             "Sociales", "Biología", "Física", "Química", "Computer Science"]
 TASK_TYPES = ["Tarea", "Examen", "Proyecto", "Extracurricular"]
 
+# ---- Fechas en español (el servidor corre con locale C, así que no
+# dependemos de strftime para los nombres de días y meses) ----
+WEEKDAYS_ES = ["Lun", "Mar", "Mié", "Jue", "Vie", "Sáb", "Dom"]
+MONTHS_ES = ["ene", "feb", "mar", "abr", "may", "jun",
+             "jul", "ago", "sep", "oct", "nov", "dic"]
+
+
+def format_date_es(value):
+    """25 ago 2026"""
+    if not value:
+        return ""
+    return f"{value.day} {MONTHS_ES[value.month - 1]} {value.year}"
+
+
+def format_day_month_es(value):
+    """25 ago"""
+    if not value:
+        return ""
+    return f"{value.day} {MONTHS_ES[value.month - 1]}"
+
+
+app.jinja_env.filters['fecha'] = format_date_es
+
 
 # ---- MODELOS ----
 class User(UserMixin, db.Model):
@@ -144,7 +167,7 @@ def build_weekly_radar(all_pending_tasks):
 
         radar.append({
             'date': day,
-            'label': day.strftime('%a').capitalize(),
+            'label': WEEKDAYS_ES[day.weekday()],
             'day_num': day.strftime('%d'),
             'exams': exams,
             'tasks': others,
@@ -183,12 +206,12 @@ def dashboard():
     critical_alerts = []
     for day in radar:
         if day['level'] == 'critico':
-            formatted_date = day['date'].strftime('%b %d')
+            formatted_date = format_day_month_es(day['date'])
             pieces = []
             if day['exams']:
-                pieces.append(f"{day['exams']} examen(es)")
+                pieces.append(f"{day['exams']} examen" + ("es" if day['exams'] > 1 else ""))
             if day['tasks']:
-                pieces.append(f"{day['tasks']} entrega(s)")
+                pieces.append(f"{day['tasks']} entrega" + ("s" if day['tasks'] > 1 else ""))
             critical_alerts.append(f"{formatted_date}: {' y '.join(pieces)}")
 
     return render_template('dashboard.html', tasks=tasks, radar=radar,
