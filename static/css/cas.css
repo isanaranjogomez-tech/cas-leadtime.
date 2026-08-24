@@ -817,3 +817,43 @@ a { color: inherit; }
 }
 
 .eyebrow--alert { color: var(--cas-red); }
+
+/* ==========================================================================
+   Acciones en cabecera de tarjeta
+   ========================================================================== */
+
+.card__head-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--s-4);
+  flex-wrap: wrap;
+}
+.card__head-actions form { margin: 0; }
+
+@media (max-width: 520px) {
+  .card__head-actions { width: 100%; justify-content: space-between; }
+}
+
+/* ==========================================================================
+   Completados — plegado, para que no compita con lo pendiente
+   ========================================================================== */
+
+.done summary {
+  list-style: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: var(--s-3);
+  padding: var(--s-4) var(--s-5);
+  user-select: none;
+}
+.done summary::-webkit-details-marker { display: none; }
+.done summary:hover { background: var(--surface-sunk); border-radius: var(--r-lg); }
+
+.done__chevron { width: 18px; height: 18px; margin-left: auto; color: var(--text-muted); transition: transform .2s; }
+.done[open] .done__chevron { transform: rotate(180deg); }
+.done[open] summary { border-bottom: 1px solid var(--border); border-radius: var(--r-lg) var(--r-lg) 0 0; }
+
+.task--done { opacity: .62; }
+.task--done .task__title { text-decoration: line-through; text-decoration-color: var(--text-muted); }
+.task--done:hover { opacity: 1; }
