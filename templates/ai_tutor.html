@@ -47,7 +47,7 @@
 
                 <p class="section-label">Cronograma</p>
                 <form method="POST" action="{{ url_for('import_plan') }}">
-                    <input type="hidden" name="plan_json" value="{{ days_plan|tojson }}">
+                    <input type="hidden" name="plan_json" value="{{ days_plan|tojson|forceescape }}">
 
                     <div class="plan__days">
                         {% for day in days_plan.days %}
