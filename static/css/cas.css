@@ -797,3 +797,23 @@ a { color: inherit; }
 }
 
 .plan__import-note { margin: 0; font-size: 12px; color: var(--text-muted); flex: 1; min-width: 180px; }
+
+/* ==========================================================================
+   Deberes vencidos
+   Un riel rojo a la izquierda los separa del resto sin gritar.
+   ========================================================================== */
+
+.task--overdue {
+  background: linear-gradient(to right, var(--cas-red-pale), transparent 60%);
+  box-shadow: inset 3px 0 0 var(--cas-red);
+}
+.task--overdue:hover { background: linear-gradient(to right, #F8DDE2, transparent 60%); }
+
+.tag--vencido {
+  background: var(--cas-red);
+  color: #fff;
+  border-color: var(--cas-red);
+  letter-spacing: .03em;
+}
+
+.eyebrow--alert { color: var(--cas-red); }
