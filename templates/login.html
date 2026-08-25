@@ -16,6 +16,7 @@
         {% include '_flashes.html' %}
 
         <form method="POST" novalidate>
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
             <div class="field">
                 <label for="email">Correo institucional</label>
                 <input class="input" id="email" type="email" name="email" required
