@@ -857,3 +857,49 @@ a { color: inherit; }
 .task--done { opacity: .62; }
 .task--done .task__title { text-decoration: line-through; text-decoration-color: var(--text-muted); }
 .task--done:hover { opacity: 1; }
+
+/* ==========================================================================
+   Horas estimadas y materias configurables
+   ========================================================================== */
+
+.field__hint {
+  font-weight: 500;
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--text-muted);
+  font-size: 11px;
+}
+
+.task__hours { color: var(--text-2); font-weight: 600; }
+
+.ledger__load {
+  font-family: var(--font-display);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--cas-navy);
+  margin: 4px 0 0;
+}
+.ledger__day--today .ledger__load { color: var(--cas-brass); }
+
+.subjects { border-top: 1px solid var(--border); }
+
+.subjects__head {
+  list-style: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: var(--s-2);
+  padding: var(--s-3) var(--s-5);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: .07em;
+  text-transform: uppercase;
+  color: var(--text-2);
+  user-select: none;
+}
+.subjects__head::-webkit-details-marker { display: none; }
+.subjects__head:hover { background: var(--surface-sunk); color: var(--cas-navy); }
+.subjects[open] .subjects__head { color: var(--cas-navy); }
+
+.subjects__body { padding: 0 var(--s-5) var(--s-5); }
+.subjects__hint { font-size: 12px; color: var(--text-muted); margin: 0 0 var(--s-3); }
