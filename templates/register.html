@@ -1,3 +1,4 @@
+
 {% extends 'base.html' %}
 {% block title %}Crear cuenta · CAS LeadTime AI{% endblock %}
 
@@ -16,6 +17,7 @@
         {% include '_flashes.html' %}
 
         <form method="POST" novalidate>
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
             <div class="field">
                 <label for="username">Nombre de usuario</label>
                 <input class="input" id="username" type="text" name="username" required
