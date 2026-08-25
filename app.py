@@ -3,6 +3,7 @@ import json
 from flask import Flask, render_template, redirect, url_for, request, flash
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
+from flask_wtf.csrf import CSRFProtect, CSRFError
 from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime, timedelta
 from groq import Groq
@@ -21,6 +22,12 @@ if database_url and database_url.startswith('postgres://'):
 
 app.config['SQLALCHEMY_DATABASE_URI'] = database_url or 'sqlite:///local_dev.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
+# Protección CSRF en todos los formularios POST.
+# Sin límite de tiempo: un estudiante puede dejar el panel abierto toda la tarde
+# y el token seguiría siendo válido mientras dure la sesión.
+app.config['WTF_CSRF_TIME_LIMIT'] = None
+csrf = CSRFProtect(app)
 
 db = SQLAlchemy(app)
 login_manager = LoginManager(app)
@@ -87,6 +94,14 @@ class Task(db.Model):
     completed = db.Column(db.Boolean, default=False)
     hours = db.Column(db.Float, nullable=True)  # horas estimadas de trabajo
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+
+
+@app.errorhandler(CSRFError)
+def handle_csrf_error(e):
+    flash('Tu sesión expiró o el formulario no era válido. Inténtalo de nuevo.', 'error')
+    if current_user.is_authenticated:
+        return redirect(url_for('dashboard')), 302
+    return redirect(url_for('login')), 302
 
 
 @login_manager.user_loader
