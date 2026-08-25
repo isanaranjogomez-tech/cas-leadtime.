@@ -942,3 +942,24 @@ a { color: inherit; }
   margin-top: 2px;
 }
 .edit-panel__form .field { margin-bottom: var(--s-3); }
+
+/* ==========================================================================
+   Horizonte: lo que viene después de la semana visible
+   ========================================================================== */
+
+.ledger:has(.ledger__day--horizon) { grid-template-columns: repeat(8, minmax(0, 1fr)); }
+
+.ledger__day--horizon {
+  background: transparent;
+  border: 1px dashed var(--cas-brass);
+}
+.ledger__day--horizon .ledger__dow { color: #6B6438; letter-spacing: .06em; }
+.ledger__day--horizon .ledger__date { color: var(--cas-brass); }
+.ledger__day--horizon .ledger__count { font-weight: 500; color: var(--text-muted); line-height: 1.35; }
+
+@media (max-width: 860px) {
+  .ledger:has(.ledger__day--horizon) { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+}
+@media (max-width: 460px) {
+  .ledger:has(.ledger__day--horizon) { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+}
