@@ -55,6 +55,28 @@
                     {% endif %}
                 </div>
                 {% endfor %}
+
+                {% if horizon %}
+                <div class="ledger__day ledger__day--horizon">
+                    <p class="ledger__dow">Más adelante</p>
+                    <p class="ledger__date num">+{{ horizon.count }}</p>
+
+                    <div class="ledger__marks">
+                        {% for _ in range(horizon.exams if horizon.exams < 3 else 3) %}
+                        <span class="ledger__mark ledger__mark--exam"></span>
+                        {% endfor %}
+                        {% for _ in range((horizon.count - horizon.exams) if (horizon.count - horizon.exams) < 5 else 5) %}
+                        <span class="ledger__mark ledger__mark--task"></span>
+                        {% endfor %}
+                    </div>
+
+                    <div class="ledger__rule"></div>
+                    <p class="ledger__load num">~{{ '%g'|format(horizon.load) }} h</p>
+                    <p class="ledger__count num">
+                        El próximo en {{ horizon.next_in }} día{{ 's' if horizon.next_in != 1 }}
+                    </p>
+                </div>
+                {% endif %}
             </div>
         </div>
     </section>
