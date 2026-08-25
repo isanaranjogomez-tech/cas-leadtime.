@@ -13,6 +13,7 @@
         <div class="card__head"><h2 class="card__title">Tus instrucciones</h2></div>
         <div class="card__body">
             <form method="POST">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                 <div class="field">
                     <label for="raw_input">Texto por desglosar</label>
                     <textarea class="textarea" id="raw_input" name="raw_input" rows="14"
@@ -47,6 +48,7 @@
 
                 <p class="section-label">Cronograma</p>
                 <form method="POST" action="{{ url_for('import_plan') }}">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                     <input type="hidden" name="plan_json" value="{{ days_plan|tojson|forceescape }}">
 
                     <div class="plan__days">
