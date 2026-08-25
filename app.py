@@ -263,11 +263,27 @@ def dashboard():
     today = datetime.now().date()
     overdue_count = sum(1 for t in tasks if t.due_date < today)
 
+    # Lo que cae más allá de la semana visible. Sin esto, un proyecto a tres
+    # semanas es invisible hasta que ya es tarde.
+    fin_semana = today + timedelta(days=6)
+    lejanos = [t for t in tasks if t.due_date > fin_semana]
+    horizon = None
+    if lejanos:
+        carga = sum(t.hours if t.hours else (2.0 if t.type == 'Examen' else 1.0) for t in lejanos)
+        proximo = min(t.due_date for t in lejanos)
+        horizon = {
+            'count': len(lejanos),
+            'exams': sum(1 for t in lejanos if t.type == 'Examen'),
+            'load': round(carga, 1),
+            'next_date': proximo,
+            'next_in': (proximo - today).days,
+        }
+
     done_tasks = Task.query.filter_by(user_id=current_user.id, completed=True)\
         .order_by(Task.due_date.desc()).limit(15).all()
 
     return render_template('dashboard.html', tasks=tasks, radar=radar, today=today,
-                            overdue_count=overdue_count, done_tasks=done_tasks,
+                            overdue_count=overdue_count, done_tasks=done_tasks, horizon=horizon,
                             alerts=critical_alerts, subjects=subjects_for(current_user),
                             my_subjects=current_user.subjects or "", task_types=TASK_TYPES)
 
