@@ -1,905 +1,551 @@
-/* ==========================================================================
-   CAS LeadTime AI — Sistema de diseño
-   Colegio Colombo Americano
-   Los colores institucionales están tomados directamente del escudo:
-   el azul del campo, el latón del anillo y el rojo de la cinta.
-   ========================================================================== */
-
-:root {
-  /* --- Identidad CAS -------------------------------------------------- */
-  --cas-navy:        #0E1240;
-  --cas-navy-deep:   #080B2C;
-  --cas-navy-soft:   #1B2154;
-  --cas-navy-line:   #2A3164;
-
-  --cas-brass:       #A6A181;
-  --cas-brass-warm:  #BFA76A;
-  --cas-brass-pale:  #E8E3D2;
-
-  --cas-red:         #C8102E;
-  --cas-red-pale:    #FBE9EC;
-
-  /* --- Superficies ---------------------------------------------------- */
-  --bg:              #F2F4FA;
-  --surface:         #FFFFFF;
-  --surface-sunk:    #F7F8FC;
-  --border:          #E1E5F0;
-  --border-strong:   #CDD4E4;
-
-  /* --- Texto ---------------------------------------------------------- */
-  --text:            #131834;
-  --text-2:          #565D7E;
-  --text-muted:      #8C93AC;
-  --text-on-navy:    #EEF0F8;
-
-  /* --- Estados -------------------------------------------------------- */
-  --success:         #1F7A5C;
-  --success-pale:    #E7F4EF;
-  --warning:         #B2811C;
-  --warning-pale:    #FBF2DF;
-  --error:           var(--cas-red);
-  --error-pale:      var(--cas-red-pale);
-  --info:            #3B4F9E;
-  --info-pale:       #EAEEFA;
-
-  /* --- Forma ---------------------------------------------------------- */
-  --r-sm: 6px;
-  --r-md: 10px;
-  --r-lg: 14px;
-  --r-xl: 20px;
-  --r-pill: 999px;
-
-  --shadow-sm: 0 1px 2px rgba(14, 18, 64, .06);
-  --shadow-md: 0 2px 8px rgba(14, 18, 64, .07);
-  --shadow-lg: 0 12px 32px rgba(14, 18, 64, .12);
-
-  /* --- Ritmo ---------------------------------------------------------- */
-  --s-1: 4px;
-  --s-2: 8px;
-  --s-3: 12px;
-  --s-4: 16px;
-  --s-5: 24px;
-  --s-6: 32px;
-  --s-7: 48px;
-  --s-8: 64px;
-
-  /* --- Tipografía ------------------------------------------------------ */
-  --font-display: 'Fraunces', Georgia, serif;
-  --font-body: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
-
-  --header-h: 68px;
-}
-
-/* ==========================================================================
-   Base
-   ========================================================================== */
-
-*, *::before, *::after { box-sizing: border-box; }
-
-html { -webkit-text-size-adjust: 100%; }
-
-body {
-  margin: 0;
-  background: var(--bg);
-  color: var(--text);
-  font-family: var(--font-body);
-  font-size: 15px;
-  line-height: 1.55;
-  -webkit-font-smoothing: antialiased;
-  min-height: 100vh;
-}
-
-h1, h2, h3, h4 { margin: 0; font-weight: 600; letter-spacing: -0.01em; }
-
-.display {
-  font-family: var(--font-display);
-  font-optical-sizing: auto;
-  font-weight: 600;
-  letter-spacing: -0.02em;
-}
-
-a { color: inherit; }
-
-:focus-visible {
-  outline: 2px solid var(--cas-brass-warm);
-  outline-offset: 2px;
-  border-radius: var(--r-sm);
-}
-
-@media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after {
-    animation-duration: .01ms !important;
-    transition-duration: .01ms !important;
-  }
-}
-
-/* Etiqueta pequeña en versalitas — usada en toda la interfaz */
-.eyebrow {
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: .11em;
-  text-transform: uppercase;
-  color: var(--text-muted);
-}
-
-.num { font-variant-numeric: tabular-nums; }
-
-/* ==========================================================================
-   Cabecera institucional
-   ========================================================================== */
-
-.site-header {
-  background: var(--cas-navy);
-  border-bottom: 3px solid var(--cas-brass);
-  color: var(--text-on-navy);
-  position: sticky;
-  top: 0;
-  z-index: 40;
-}
-
-.site-header__inner {
-  max-width: 1240px;
-  margin: 0 auto;
-  padding: 0 var(--s-5);
-  min-height: var(--header-h);
-  display: flex;
-  align-items: center;
-  gap: var(--s-5);
-}
-
-.brand {
-  display: flex;
-  align-items: center;
-  gap: var(--s-3);
-  text-decoration: none;
-  flex-shrink: 0;
-}
-
-.brand__crest {
-  width: 40px;
-  height: 40px;
-  display: block;
-  background: var(--cas-brass-pale);
-  border-radius: var(--r-pill);
-  padding: 2px;
-  box-shadow: 0 0 0 1px rgba(166,161,129,.55);
-}
-
-.brand__name {
-  font-family: var(--font-display);
-  font-size: 17px;
-  font-weight: 600;
-  color: #fff;
-  line-height: 1.15;
-  letter-spacing: -0.01em;
-}
-
-.brand__school {
-  font-size: 10px;
-  font-weight: 600;
-  letter-spacing: .1em;
-  text-transform: uppercase;
-  color: var(--cas-brass);
-  line-height: 1.3;
-}
-
-.site-nav { display: flex; align-items: center; gap: var(--s-1); margin-left: auto; }
-
-.site-nav__link {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--s-2);
-  padding: 9px 14px;
-  border-radius: var(--r-md);
-  font-size: 14px;
-  font-weight: 600;
-  color: #B9BFD9;
-  text-decoration: none;
-  transition: background .18s, color .18s;
-  white-space: nowrap;
-}
-
-.site-nav__link:hover { background: rgba(255,255,255,.07); color: #fff; }
-
-.site-nav__link[aria-current="page"] {
-  background: var(--cas-navy-soft);
-  color: #fff;
-  box-shadow: inset 0 0 0 1px var(--cas-navy-line);
-}
-
-.site-nav__link svg { width: 17px; height: 17px; flex-shrink: 0; }
-
-.site-user {
-  display: flex;
-  align-items: center;
-  gap: var(--s-3);
-  padding-left: var(--s-5);
-  margin-left: var(--s-2);
-  border-left: 1px solid rgba(255,255,255,.14);
-}
-
-.site-user__name { font-size: 13px; font-weight: 600; color: #fff; }
-.site-user__role { font-size: 10px; letter-spacing: .09em; text-transform: uppercase; color: var(--cas-brass); }
-
-.site-user__out {
-  color: #98A0C0;
-  display: inline-flex;
-  padding: 7px;
-  border-radius: var(--r-md);
-  transition: background .18s, color .18s;
-}
-.site-user__out:hover { background: rgba(255,255,255,.07); color: #fff; }
-.site-user__out svg { width: 17px; height: 17px; }
-
-@media (max-width: 720px) {
-  .site-header__inner {
-    flex-wrap: wrap;
-    padding: var(--s-3) var(--s-4);
-    gap: var(--s-3);
-    row-gap: 0;
-  }
-  .site-nav {
-    order: 3;
-    width: 100%;
-    margin-left: 0;
-    border-top: 1px solid rgba(255,255,255,.1);
-    padding-top: var(--s-2);
-    margin-top: var(--s-1);
-  }
-  .site-nav__link { flex: 1; justify-content: center; padding: 10px 8px; }
-  .site-user { margin-left: auto; padding-left: 0; border-left: 0; }
-  .site-user__meta { display: none; }
-  .brand__crest { width: 36px; height: 36px; }
-}
-
-/* ==========================================================================
-   Estructura de página
-   ========================================================================== */
-
-.page {
-  max-width: 1240px;
-  margin: 0 auto;
-  padding: var(--s-6) var(--s-5) var(--s-8);
-}
-
-.page-head { margin-bottom: var(--s-6); }
-
-.page-head h1 {
-  font-family: var(--font-display);
-  font-size: clamp(26px, 4vw, 34px);
-  font-weight: 600;
-  letter-spacing: -0.025em;
-}
-
-.page-head p { margin: 6px 0 0; color: var(--text-2); font-size: 14px; }
-
-@media (max-width: 640px) {
-  .page { padding: var(--s-5) var(--s-4) var(--s-7); }
-}
-
-/* ==========================================================================
-   Tarjetas
-   ========================================================================== */
-
-.card {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--r-lg);
-  box-shadow: var(--shadow-sm);
-}
-
-.card__head {
-  padding: var(--s-4) var(--s-5);
-  border-bottom: 1px solid var(--border);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--s-4);
-  flex-wrap: wrap;
-}
-
-.card__title { font-size: 15px; font-weight: 700; }
-.card__body { padding: var(--s-5); }
-
-/* ==========================================================================
-   Bitácora de la semana — elemento distintivo
-   Cada pendiente es una marca sobre una línea de latón, como en una
-   agenda escolar de pared. Los exámenes son barras rojas; las entregas,
-   marcas azules. Se pueden contar a simple vista.
-   ========================================================================== */
-
-.ledger {
-  display: grid;
-  grid-template-columns: repeat(7, minmax(0, 1fr));
-  gap: var(--s-2);
-}
-
-.ledger__day {
-  position: relative;
-  padding: var(--s-3) var(--s-2) var(--s-3);
-  border-radius: var(--r-md);
-  background: var(--surface-sunk);
-  border: 1px solid transparent;
-  display: flex;
-  flex-direction: column;
-  min-height: 132px;
-}
-
-.ledger__day--today {
-  background: var(--cas-navy);
-  border-color: var(--cas-navy);
-}
-.ledger__day--today .ledger__dow,
-.ledger__day--today .ledger__count { color: var(--cas-brass); }
-.ledger__day--today .ledger__date { color: #fff; }
-.ledger__day--today .ledger__rule { background: rgba(166,161,129,.5); }
-
-.ledger__day--critical { background: var(--cas-red-pale); border-color: rgba(200,16,46,.22); }
-.ledger__day--medium   { background: var(--warning-pale); border-color: rgba(178,129,28,.2); }
-
-.ledger__dow {
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: .1em;
-  text-transform: uppercase;
-  color: var(--text-muted);
-}
-
-.ledger__date {
-  font-family: var(--font-display);
-  font-size: 22px;
-  font-weight: 600;
-  font-variant-numeric: tabular-nums;
-  line-height: 1.1;
-  margin-top: 2px;
-}
-
-/* marcas apiladas sobre la línea base */
-.ledger__marks {
-  margin-top: auto;
-  display: flex;
-  align-items: flex-end;
-  gap: 3px;
-  min-height: 34px;
-  flex-wrap: wrap;
-}
-
-.ledger__mark { width: 7px; border-radius: 2px; display: block; }
-.ledger__mark--exam { height: 30px; background: var(--cas-red); }
-.ledger__mark--task { height: 16px; background: var(--info); opacity: .75; }
-.ledger__day--today .ledger__mark--task { background: #7E8CD4; opacity: 1; }
-
-.ledger__rule { height: 2px; background: var(--cas-brass); margin-top: 6px; border-radius: 2px; }
-
-.ledger__count { font-size: 11px; color: var(--text-2); margin-top: 6px; font-weight: 600; }
-.ledger__count--empty { color: var(--text-muted); font-weight: 500; }
-
-.legend { display: flex; gap: var(--s-4); flex-wrap: wrap; }
-.legend span { display: inline-flex; align-items: center; gap: 6px; font-size: 11px; color: var(--text-2); font-weight: 600; }
-.legend i { width: 8px; height: 8px; border-radius: 2px; display: block; }
-
-@media (max-width: 860px) {
-  .ledger { grid-template-columns: repeat(4, minmax(0, 1fr)); }
-}
-@media (max-width: 460px) {
-  .ledger { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 5px; }
-  .ledger__day { min-height: 104px; padding: 9px 6px; }
-  .ledger__date { font-size: 18px; }
-  .ledger__dow { font-size: 9px; letter-spacing: .06em; }
-  .ledger__count { font-size: 10px; }
-  .ledger__marks { min-height: 26px; gap: 2px; }
-  .ledger__mark { width: 5px; }
-  .ledger__mark--exam { height: 24px; }
-  .ledger__mark--task { height: 13px; }
-}
-
-/* ==========================================================================
-   Avisos
-   ========================================================================== */
-
-.notice {
-  display: flex;
-  align-items: flex-start;
-  gap: var(--s-3);
-  padding: var(--s-3) var(--s-4);
-  border-radius: var(--r-md);
-  font-size: 14px;
-  font-weight: 500;
-  border: 1px solid;
-}
-.notice svg { width: 17px; height: 17px; flex-shrink: 0; margin-top: 2px; }
-.notice--error   { background: var(--error-pale);   border-color: rgba(200,16,46,.22); color: #8E0B20; }
-.notice--success { background: var(--success-pale); border-color: rgba(31,122,92,.22); color: #14573F; }
-.notice--warning { background: var(--warning-pale); border-color: rgba(178,129,28,.24); color: #7A5810; }
-
-.notice-stack { display: flex; flex-direction: column; gap: var(--s-2); margin-bottom: var(--s-5); }
-
-/* ==========================================================================
-   Formularios
-   ========================================================================== */
-
-.field { display: block; margin-bottom: var(--s-4); }
-
-.field > label {
-  display: block;
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: .09em;
-  text-transform: uppercase;
-  color: var(--text-2);
-  margin-bottom: 6px;
-}
-
-.input, .select, .textarea {
-  width: 100%;
-  font-family: inherit;
-  font-size: 14px;
-  color: var(--text);
-  background: var(--surface);
-  border: 1px solid var(--border-strong);
-  border-radius: var(--r-md);
-  padding: 11px 13px;
-  transition: border-color .16s, box-shadow .16s;
-}
-
-.textarea { resize: vertical; line-height: 1.6; }
-
-.input::placeholder, .textarea::placeholder { color: var(--text-muted); }
-
-.input:focus, .select:focus, .textarea:focus {
-  outline: none;
-  border-color: var(--cas-navy);
-  box-shadow: 0 0 0 3px rgba(14,18,64,.09);
-}
-
-.select {
-  -webkit-appearance: none;
-  appearance: none;
-  padding-right: 38px;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23565D7E' stroke-width='2.2' stroke-linecap='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
-  background-repeat: no-repeat;
-  background-position: right 12px center;
-}
-
-.field-row { display: grid; grid-template-columns: 1fr 1fr; gap: var(--s-3); }
-
-/* ==========================================================================
-   Botones
-   ========================================================================== */
-
-.btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: var(--s-2);
-  font-family: inherit;
-  font-size: 14px;
-  font-weight: 700;
-  padding: 11px 20px;
-  border-radius: var(--r-md);
-  border: 1px solid transparent;
-  cursor: pointer;
-  text-decoration: none;
-  transition: background .18s, border-color .18s, color .18s, box-shadow .18s;
-}
-.btn svg { width: 16px; height: 16px; }
-
-.btn--primary { background: var(--cas-navy); color: #fff; box-shadow: var(--shadow-sm); }
-.btn--primary:hover { background: var(--cas-navy-soft); }
-
-.btn--block { width: 100%; }
-
-.btn--quiet {
-  background: var(--surface);
-  color: var(--text-2);
-  border-color: var(--border-strong);
-  font-size: 13px;
-  padding: 8px 14px;
-}
-.btn--quiet:hover { border-color: var(--cas-navy); color: var(--cas-navy); }
-
-.btn--done {
-  background: var(--success-pale);
-  color: var(--success);
-  border-color: rgba(31,122,92,.28);
-  font-size: 13px;
-  padding: 8px 14px;
-}
-.btn--done:hover { background: #D9EDE5; }
-
-.btn--icon {
-  padding: 9px;
-  background: var(--surface);
-  border-color: var(--border-strong);
-  color: var(--text-muted);
-}
-.btn--icon:hover { background: var(--error-pale); border-color: rgba(200,16,46,.3); color: var(--cas-red); }
-
-/* ==========================================================================
-   Etiquetas de tipo de deber
-   ========================================================================== */
-
-.tag {
-  display: inline-flex;
-  align-items: center;
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: .04em;
-  padding: 3px 9px;
-  border-radius: var(--r-sm);
-  border: 1px solid;
-}
-.tag--examen          { background: var(--error-pale);   color: #8E0B20; border-color: rgba(200,16,46,.24); }
-.tag--proyecto        { background: var(--info-pale);    color: #2C3D80; border-color: rgba(59,79,158,.22); }
-.tag--extracurricular { background: var(--success-pale); color: #14573F; border-color: rgba(31,122,92,.24); }
-.tag--tarea           { background: #F0EEE3;             color: #6B6438; border-color: rgba(166,161,129,.4); }
-
-/* ==========================================================================
-   Lista de deberes
-   ========================================================================== */
-
-.task {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--s-4);
-  padding: var(--s-4) var(--s-5);
-  border-bottom: 1px solid var(--border);
-  transition: background .16s;
-}
-.task:last-child { border-bottom: 0; }
-.task:hover { background: var(--surface-sunk); }
-
-.task__main { min-width: 0; }
-.task__meta { display: flex; align-items: center; gap: var(--s-2); flex-wrap: wrap; margin-bottom: 5px; }
-.task__subject { font-size: 12px; font-weight: 600; color: var(--text-2); }
-.task__title { font-size: 15px; font-weight: 700; color: var(--text); }
-.task__notes {
-  font-size: 13px; color: var(--text-2); margin: 3px 0 0;
-  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
-}
-.task__due { font-size: 12px; font-weight: 600; color: var(--text-2); margin-top: 5px; }
-.task__due strong { color: var(--cas-navy); font-variant-numeric: tabular-nums; }
-.task__due--soon strong { color: var(--cas-red); }
-
-.task__actions { display: flex; align-items: center; gap: var(--s-2); flex-shrink: 0; }
-.task__actions form { margin: 0; }
-
-@media (max-width: 620px) {
-  .task { flex-direction: column; align-items: stretch; gap: var(--s-3); }
-  .task__actions { justify-content: flex-start; }
-}
-
-.empty {
-  padding: var(--s-7) var(--s-5);
-  text-align: center;
-  color: var(--text-2);
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-}
-.empty__title { font-family: var(--font-display); font-size: 17px; color: var(--text); margin: 0 0 6px; }
-.empty p { margin: 0; font-size: 14px; }
-
-/* ==========================================================================
-   Rejillas
-   ========================================================================== */
-
-.stack { display: flex; flex-direction: column; gap: var(--s-5); }
-
-.split {
-  display: grid;
-  grid-template-columns: minmax(0, 340px) minmax(0, 1fr);
-  gap: var(--s-5);
-  align-items: start;
-}
-.split--even { grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: stretch; }
-.split--even > .card { display: flex; flex-direction: column; }
-.split--even .plan-scroll { flex: 1; }
-
-@media (max-width: 940px) {
-  .split, .split--even { grid-template-columns: minmax(0, 1fr); }
-}
-
-/* ==========================================================================
-   Acceso (login / registro)
-   ========================================================================== */
-
-.auth {
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: var(--s-6) var(--s-4);
-  background:
-    radial-gradient(900px 420px at 50% -10%, #E6EAF6 0%, rgba(230,234,246,0) 70%),
-    var(--bg);
-}
-
-.auth__card {
-  width: 100%;
-  max-width: 430px;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-top: 3px solid var(--cas-brass);
-  border-radius: var(--r-xl);
-  box-shadow: var(--shadow-lg);
-  padding: var(--s-6) var(--s-6) var(--s-5);
-}
-
-.auth__crest { width: 76px; height: 76px; display: block; margin: 0 auto var(--s-4); }
-
-.auth__head { text-align: center; margin-bottom: var(--s-6); }
-
-.auth__title {
-  font-family: var(--font-display);
-  font-size: 27px;
-  font-weight: 600;
-  letter-spacing: -0.025em;
-}
-
-.auth__school {
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: .13em;
-  text-transform: uppercase;
-  color: var(--cas-brass);
-  margin: var(--s-2) 0 0;
-}
-
-.auth__motto {
-  font-family: var(--font-display);
-  font-style: italic;
-  font-size: 13px;
-  color: var(--text-2);
-  margin: 5px 0 0;
-}
-
-.auth__alt { text-align: center; font-size: 13px; color: var(--text-2); margin: var(--s-5) 0 0; }
-.auth__alt a { color: var(--cas-navy); font-weight: 700; text-decoration: none; }
-.auth__alt a:hover { text-decoration: underline; }
-
-.auth__foot {
-  margin-top: var(--s-5);
-  font-size: 11px;
-  letter-spacing: .06em;
-  color: var(--text-muted);
-  text-align: center;
-}
-
-@media (max-width: 460px) {
-  .auth__card { padding: var(--s-5) var(--s-4) var(--s-4); }
-  .auth__crest { width: 64px; height: 64px; }
-}
-
-/* ==========================================================================
-   Desglosador IA
-   ========================================================================== */
-
-.plan { padding: var(--s-5); }
-
-.plan__head {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: var(--s-4);
-  padding-bottom: var(--s-4);
-  border-bottom: 1px solid var(--border);
-}
-
-.plan__title { font-family: var(--font-display); font-size: 21px; font-weight: 600; letter-spacing: -0.02em; margin-top: 3px; }
-
-.effort {
-  flex-shrink: 0;
-  text-align: center;
-  border: 1px solid var(--border);
-  border-radius: var(--r-md);
-  padding: 7px 13px;
-  background: var(--surface-sunk);
-}
-.effort__val { font-family: var(--font-display); font-size: 19px; font-weight: 700; color: var(--cas-navy); font-variant-numeric: tabular-nums; }
-.effort__val span { color: var(--text-muted); font-size: 13px; }
-
-.plan__intro { font-size: 14px; color: var(--text-2); margin: var(--s-4) 0 0; }
-
-.plan__days { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: var(--s-3); margin-top: var(--s-3); }
-
-.day-card { border: 1px solid var(--border); border-radius: var(--r-md); padding: var(--s-4); background: var(--surface-sunk); }
-.day-card__label { font-size: 11px; font-weight: 700; letter-spacing: .07em; text-transform: uppercase; color: var(--cas-navy); margin-bottom: var(--s-2); }
-.day-card__item { margin-bottom: var(--s-3); }
-.day-card__item:last-child { margin-bottom: 0; }
-.day-card__subject { font-size: 12px; font-weight: 700; color: var(--text); }
-.day-card__task { font-size: 13px; color: var(--text-2); margin: 1px 0 0; }
-
-.technique { border: 1px solid rgba(166,161,129,.45); background: #FBFAF5; border-radius: var(--r-md); padding: var(--s-4); margin-top: var(--s-5); }
-.technique__label { font-size: 11px; font-weight: 700; letter-spacing: .07em; text-transform: uppercase; color: #6B6438; margin-bottom: 5px; }
-.technique p { margin: 0; font-size: 13px; color: var(--text-2); }
-
-.quote {
-  font-family: var(--font-display);
-  font-style: italic;
-  font-size: 15px;
-  color: var(--text-2);
-  text-align: center;
-  margin: var(--s-5) 0 0;
-  padding-top: var(--s-5);
-  border-top: 1px solid var(--border);
-}
-
-.plan-scroll { max-height: 620px; overflow-y: auto; }
-
-.section-label {
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: .09em;
-  text-transform: uppercase;
-  color: var(--text-2);
-  margin: var(--s-5) 0 0;
-  display: flex;
-  align-items: center;
-  gap: var(--s-2);
-}
-.section-label::after { content: ""; flex: 1; height: 1px; background: var(--border); }
-
-/* ==========================================================================
-   Selección de actividades del plan para llevarlas al panel
-   ========================================================================== */
-
-.pick {
-  display: flex;
-  align-items: flex-start;
-  gap: var(--s-2);
-  cursor: pointer;
-  padding: 5px 6px;
-  margin: 0 -6px var(--s-2);
-  border-radius: var(--r-sm);
-  transition: background .16s;
-}
-.pick:last-child { margin-bottom: 0; }
-.pick:hover { background: rgba(14,18,64,.04); }
-
-.pick__box {
-  -webkit-appearance: none;
-  appearance: none;
-  flex-shrink: 0;
-  width: 16px;
-  height: 16px;
-  margin: 2px 0 0;
-  border: 1.5px solid var(--border-strong);
-  border-radius: 4px;
-  background: var(--surface);
-  cursor: pointer;
-  transition: background .16s, border-color .16s;
-}
-.pick__box:checked {
-  background: var(--cas-navy);
-  border-color: var(--cas-navy);
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='3.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M20 6L9 17l-5-5'/%3E%3C/svg%3E");
-  background-repeat: no-repeat;
-  background-position: center;
-}
-.pick:has(.pick__box:not(:checked)) { opacity: .5; }
-
-.pick .day-card__subject,
-.pick .day-card__task { display: block; }
-
-.plan__import {
-  display: flex;
-  align-items: center;
-  gap: var(--s-4);
-  flex-wrap: wrap;
-  margin-top: var(--s-5);
-  padding-top: var(--s-5);
-  border-top: 1px solid var(--border);
-}
-
-.plan__import-note { margin: 0; font-size: 12px; color: var(--text-muted); flex: 1; min-width: 180px; }
-
-/* ==========================================================================
-   Deberes vencidos
-   Un riel rojo a la izquierda los separa del resto sin gritar.
-   ========================================================================== */
-
-.task--overdue {
-  background: linear-gradient(to right, var(--cas-red-pale), transparent 60%);
-  box-shadow: inset 3px 0 0 var(--cas-red);
-}
-.task--overdue:hover { background: linear-gradient(to right, #F8DDE2, transparent 60%); }
-
-.tag--vencido {
-  background: var(--cas-red);
-  color: #fff;
-  border-color: var(--cas-red);
-  letter-spacing: .03em;
-}
-
-.eyebrow--alert { color: var(--cas-red); }
-
-/* ==========================================================================
-   Acciones en cabecera de tarjeta
-   ========================================================================== */
-
-.card__head-actions {
-  display: flex;
-  align-items: center;
-  gap: var(--s-4);
-  flex-wrap: wrap;
-}
-.card__head-actions form { margin: 0; }
-
-@media (max-width: 520px) {
-  .card__head-actions { width: 100%; justify-content: space-between; }
-}
-
-/* ==========================================================================
-   Completados — plegado, para que no compita con lo pendiente
-   ========================================================================== */
-
-.done summary {
-  list-style: none;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: var(--s-3);
-  padding: var(--s-4) var(--s-5);
-  user-select: none;
-}
-.done summary::-webkit-details-marker { display: none; }
-.done summary:hover { background: var(--surface-sunk); border-radius: var(--r-lg); }
-
-.done__chevron { width: 18px; height: 18px; margin-left: auto; color: var(--text-muted); transition: transform .2s; }
-.done[open] .done__chevron { transform: rotate(180deg); }
-.done[open] summary { border-bottom: 1px solid var(--border); border-radius: var(--r-lg) var(--r-lg) 0 0; }
-
-.task--done { opacity: .62; }
-.task--done .task__title { text-decoration: line-through; text-decoration-color: var(--text-muted); }
-.task--done:hover { opacity: 1; }
-
-/* ==========================================================================
-   Horas estimadas y materias configurables
-   ========================================================================== */
-
-.field__hint {
-  font-weight: 500;
-  letter-spacing: 0;
-  text-transform: none;
-  color: var(--text-muted);
-  font-size: 11px;
-}
-
-.task__hours { color: var(--text-2); font-weight: 600; }
-
-.ledger__load {
-  font-family: var(--font-display);
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--cas-navy);
-  margin: 4px 0 0;
-}
-.ledger__day--today .ledger__load { color: var(--cas-brass); }
-
-.subjects { border-top: 1px solid var(--border); }
-
-.subjects__head {
-  list-style: none;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: var(--s-2);
-  padding: var(--s-3) var(--s-5);
-  font-size: 12px;
-  font-weight: 700;
-  letter-spacing: .07em;
-  text-transform: uppercase;
-  color: var(--text-2);
-  user-select: none;
-}
-.subjects__head::-webkit-details-marker { display: none; }
-.subjects__head:hover { background: var(--surface-sunk); color: var(--cas-navy); }
-.subjects[open] .subjects__head { color: var(--cas-navy); }
-
-.subjects__body { padding: 0 var(--s-5) var(--s-5); }
-.subjects__hint { font-size: 12px; color: var(--text-muted); margin: 0 0 var(--s-3); }
+import os
+import json
+from flask import Flask, render_template, redirect, url_for, request, flash
+from flask_sqlalchemy import SQLAlchemy
+from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
+from flask_wtf.csrf import CSRFProtect, CSRFError
+from werkzeug.security import generate_password_hash, check_password_hash
+from datetime import datetime, timedelta
+from groq import Groq
+
+app = Flask(__name__)
+
+# ---- SECRET KEY: nunca hardcodeada en producción ----
+app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'dev-only-insecure-key-change-me')
+
+# ---- BASE DE DATOS: usa Postgres persistente si existe DATABASE_URL (Render),
+# cae a SQLite local solo para desarrollo en tu computador ----
+database_url = os.getenv('DATABASE_URL')
+if database_url and database_url.startswith('postgres://'):
+    # Render entrega el URI viejo, SQLAlchemy 2.x necesita el prefijo postgresql://
+    database_url = database_url.replace('postgres://', 'postgresql://', 1)
+
+app.config['SQLALCHEMY_DATABASE_URI'] = database_url or 'sqlite:///local_dev.db'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
+# Protección CSRF en todos los formularios POST.
+# Sin límite de tiempo: un estudiante puede dejar el panel abierto toda la tarde
+# y el token seguiría siendo válido mientras dure la sesión.
+app.config['WTF_CSRF_TIME_LIMIT'] = None
+csrf = CSRFProtect(app)
+
+db = SQLAlchemy(app)
+login_manager = LoginManager(app)
+login_manager.login_view = 'login'
+
+# ---- Groq (límite gratuito diario mucho más alto que Gemini) ----
+GROQ_API_KEY = os.getenv("GROQ_API_KEY")
+groq_client = Groq(api_key=GROQ_API_KEY) if GROQ_API_KEY else None
+
+SUBJECTS = ["Math", "Language Arts", "Lenguaje", "Geometría", "Global Perspectives",
+            "Sociales", "Biología", "Física", "Química", "Computer Science"]
+TASK_TYPES = ["Tarea", "Examen", "Proyecto", "Extracurricular"]
+
+# ---- Fechas en español (el servidor corre con locale C, así que no
+# dependemos de strftime para los nombres de días y meses) ----
+WEEKDAYS_ES = ["Lun", "Mar", "Mié", "Jue", "Vie", "Sáb", "Dom"]
+MONTHS_ES = ["ene", "feb", "mar", "abr", "may", "jun",
+             "jul", "ago", "sep", "oct", "nov", "dic"]
+
+
+def subjects_for(user):
+    """Materias del estudiante; si no configuró ninguna, usa la lista del colegio."""
+    if user and user.subjects:
+        propias = [ln.strip() for ln in user.subjects.splitlines() if ln.strip()]
+        if propias:
+            return propias
+    return SUBJECTS
+
+
+def format_date_es(value):
+    """25 ago 2026"""
+    if not value:
+        return ""
+    return f"{value.day} {MONTHS_ES[value.month - 1]} {value.year}"
+
+
+def format_day_month_es(value):
+    """25 ago"""
+    if not value:
+        return ""
+    return f"{value.day} {MONTHS_ES[value.month - 1]}"
+
+
+app.jinja_env.filters['fecha'] = format_date_es
+
+
+# ---- MODELOS ----
+class User(UserMixin, db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(150), unique=True, nullable=False)
+    email = db.Column(db.String(150), unique=True, nullable=False)
+    password = db.Column(db.String(200), nullable=False)
+    subjects = db.Column(db.Text, nullable=True)  # una materia por línea; vacío = lista CAS
+    tasks = db.relationship('Task', backref='student', lazy=True, cascade="all, delete-orphan")
+
+
+class Task(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.String(200), nullable=False)
+    subject = db.Column(db.String(100), nullable=False)
+    type = db.Column(db.String(50), nullable=False)
+    due_date = db.Column(db.Date, nullable=False)
+    notes = db.Column(db.Text, nullable=True)
+    completed = db.Column(db.Boolean, default=False)
+    hours = db.Column(db.Float, nullable=True)  # horas estimadas de trabajo
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+
+
+@app.errorhandler(CSRFError)
+def handle_csrf_error(e):
+    flash('Tu sesión expiró o el formulario no era válido. Inténtalo de nuevo.', 'error')
+    if current_user.is_authenticated:
+        return redirect(url_for('dashboard')), 302
+    return redirect(url_for('login')), 302
+
+
+@login_manager.user_loader
+def load_user(user_id):
+    return db.session.get(User, int(user_id))
+
+
+# ---- AUTENTICACIÓN ----
+@app.route('/')
+def index():
+    if current_user.is_authenticated:
+        return redirect(url_for('dashboard'))
+    return redirect(url_for('login'))
+
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if current_user.is_authenticated:
+        return redirect(url_for('dashboard'))
+    if request.method == 'POST':
+        email = request.form.get('email', '').strip().lower()
+        password = request.form.get('password', '')
+        user = User.query.filter_by(email=email).first()
+
+        if user and check_password_hash(user.password, password):
+            login_user(user, remember=True)
+            return redirect(url_for('dashboard'))
+
+        flash('Credenciales incorrectas. Verifica tu correo y contraseña.', 'error')
+    return render_template('login.html')
+
+
+@app.route('/register', methods=['GET', 'POST'])
+def register():
+    if current_user.is_authenticated:
+        return redirect(url_for('dashboard'))
+    if request.method == 'POST':
+        username = request.form.get('username', '').strip()
+        email = request.form.get('email', '').strip().lower()
+        password = request.form.get('password', '')
+
+        if not username or not email or not password:
+            flash('Todos los campos son obligatorios.', 'error')
+            return render_template('register.html')
+
+        user_exists = User.query.filter((User.email == email) | (User.username == username)).first()
+        if user_exists:
+            flash('El usuario o correo ya está registrado.', 'error')
+            return render_template('register.html')
+
+        hashed_password = generate_password_hash(password, method='scrypt')
+        new_user = User(username=username, email=email, password=hashed_password)
+
+        db.session.add(new_user)
+        db.session.commit()
+
+        flash('Registro exitoso. Ya puedes iniciar sesión.', 'success')
+        return redirect(url_for('login'))
+
+    return render_template('register.html')
+
+
+@app.route('/logout')
+@login_required
+def logout():
+    logout_user()
+    return redirect(url_for('login'))
+
+
+# ---- DASHBOARD ----
+def build_weekly_radar(all_pending_tasks):
+    """Construye un radar de 7 días (hoy + 6) con el nivel de carga por día."""
+    today = datetime.now().date()
+    radar = []
+    for i in range(7):
+        day = today + timedelta(days=i)
+        day_tasks = [t for t in all_pending_tasks if t.due_date == day]
+        exams = sum(1 for t in day_tasks if t.type == 'Examen')
+        others = len(day_tasks) - exams
+
+        # Carga en horas. Si un deber no tiene estimación, asumimos 1h
+        # (2h si es examen) para no subestimar el día.
+        load = 0.0
+        for t in day_tasks:
+            if t.hours:
+                load += t.hours
+            else:
+                load += 2.0 if t.type == 'Examen' else 1.0
+
+        if exams >= 1 or load >= 4:
+            level = 'critico'
+        elif load >= 2:
+            level = 'medio'
+        elif load > 0:
+            level = 'bajo'
+        else:
+            level = 'libre'
+
+        radar.append({
+            'date': day,
+            'label': WEEKDAYS_ES[day.weekday()],
+            'day_num': day.strftime('%d'),
+            'exams': exams,
+            'tasks': others,
+            'load': round(load, 1),
+            'level': level,
+            'is_today': i == 0,
+        })
+    return radar
+
+
+@app.route('/dashboard', methods=['GET', 'POST'])
+@login_required
+def dashboard():
+    if request.method == 'POST':
+        title = request.form.get('title', '').strip()
+        subject = request.form.get('subject')
+        task_type = request.form.get('type')
+        due_date_str = request.form.get('due_date')
+        notes = request.form.get('notes', '').strip()
+
+        hours = None
+        hours_raw = (request.form.get('hours') or '').strip().replace(',', '.')
+        if hours_raw:
+            try:
+                hours = max(0.0, min(float(hours_raw), 24.0))
+            except ValueError:
+                hours = None
+
+        if title and subject and task_type and due_date_str:
+            due_date = datetime.strptime(due_date_str, '%Y-%m-%d').date()
+            new_task = Task(title=title, subject=subject, type=task_type, hours=hours,
+                             due_date=due_date, notes=notes, student=current_user)
+            db.session.add(new_task)
+            db.session.commit()
+            flash('Deber añadido correctamente.', 'success')
+        else:
+            flash('Completa título, materia, tipo y fecha límite.', 'error')
+        return redirect(url_for('dashboard'))
+
+    tasks = Task.query.filter_by(user_id=current_user.id, completed=False)\
+        .order_by(Task.due_date).all()
+
+    radar = build_weekly_radar(tasks)
+
+    critical_alerts = []
+    for day in radar:
+        if day['level'] == 'critico':
+            formatted_date = format_day_month_es(day['date'])
+            pieces = []
+            if day['exams']:
+                pieces.append(f"{day['exams']} examen" + ("es" if day['exams'] > 1 else ""))
+            if day['tasks']:
+                pieces.append(f"{day['tasks']} entrega" + ("s" if day['tasks'] > 1 else ""))
+            if day['load']:
+                pieces.append(f"~{day['load']:g} h")
+            critical_alerts.append(f"{formatted_date}: {' y '.join(pieces)}")
+
+    today = datetime.now().date()
+    overdue_count = sum(1 for t in tasks if t.due_date < today)
+
+    done_tasks = Task.query.filter_by(user_id=current_user.id, completed=True)\
+        .order_by(Task.due_date.desc()).limit(15).all()
+
+    return render_template('dashboard.html', tasks=tasks, radar=radar, today=today,
+                            overdue_count=overdue_count, done_tasks=done_tasks,
+                            alerts=critical_alerts, subjects=subjects_for(current_user),
+                            my_subjects=current_user.subjects or "", task_types=TASK_TYPES)
+
+
+@app.route('/materias', methods=['POST'])
+@login_required
+def update_subjects():
+    texto = request.form.get('subjects', '')
+    limpias = [ln.strip() for ln in texto.splitlines() if ln.strip()][:30]
+    current_user.subjects = "\n".join(limpias) if limpias else None
+    db.session.commit()
+    if limpias:
+        flash(f'Guardaste {len(limpias)} materia{"s" if len(limpias) > 1 else ""}.', 'success')
+    else:
+        flash('Volviste a la lista de materias del colegio.', 'success')
+    return redirect(url_for('dashboard'))
+
+
+@app.route('/complete/<int:task_id>', methods=['POST'])
+@login_required
+def complete_task(task_id):
+    task = db.session.get(Task, task_id)
+    if task and task.user_id == current_user.id:
+        task.completed = True
+        db.session.commit()
+        flash(f'"{task.title}" completado. Puedes reabrirlo desde "Completados".', 'success')
+    return redirect(url_for('dashboard'))
+
+
+@app.route('/reabrir/<int:task_id>', methods=['POST'])
+@login_required
+def reopen_task(task_id):
+    task = db.session.get(Task, task_id)
+    if task and task.user_id == current_user.id:
+        task.completed = False
+        db.session.commit()
+        flash(f'"{task.title}" volvió a tus pendientes.', 'success')
+    return redirect(url_for('dashboard'))
+
+
+@app.route('/editar/<int:task_id>', methods=['POST'])
+@login_required
+def edit_task(task_id):
+    task = db.session.get(Task, task_id)
+    if not task or task.user_id != current_user.id:
+        flash('No encontramos ese deber.', 'error')
+        return redirect(url_for('dashboard'))
+
+    title = request.form.get('title', '').strip()
+    subject = request.form.get('subject')
+    task_type = request.form.get('type')
+    due_date_str = request.form.get('due_date')
+
+    if not (title and subject and task_type and due_date_str):
+        flash('Completa título, materia, tipo y fecha límite.', 'error')
+        return redirect(url_for('dashboard'))
+
+    try:
+        due_date = datetime.strptime(due_date_str, '%Y-%m-%d').date()
+    except ValueError:
+        flash('La fecha no es válida.', 'error')
+        return redirect(url_for('dashboard'))
+
+    hours = None
+    hours_raw = (request.form.get('hours') or '').strip().replace(',', '.')
+    if hours_raw:
+        try:
+            hours = max(0.0, min(float(hours_raw), 24.0))
+        except ValueError:
+            hours = None
+
+    task.title = title
+    task.subject = subject
+    task.type = task_type
+    task.due_date = due_date
+    task.hours = hours
+    task.notes = request.form.get('notes', '').strip()
+    db.session.commit()
+    flash(f'"{task.title}" actualizado.', 'success')
+    return redirect(url_for('dashboard'))
+
+
+@app.route('/delete/<int:task_id>', methods=['POST'])
+@login_required
+def delete_task(task_id):
+    task = db.session.get(Task, task_id)
+    if task and task.user_id == current_user.id:
+        db.session.delete(task)
+        db.session.commit()
+    return redirect(url_for('dashboard'))
+
+
+# ---- IA: DESGLOSADOR ----
+def generate_plan(raw_input):
+    """Pide el plan a Groq. Devuelve (days_plan, mensaje_de_error)."""
+    if not groq_client:
+        return None, ("<p>No hay una API Key de Groq configurada en este entorno. Define la "
+                      "variable de entorno GROQ_API_KEY para activar el Desglosador IA.</p>")
+
+    system_prompt = (
+        "Actúas como un tutor experto en productividad y organización académica para el "
+        "Colegio Colombo Americano (CAS). El usuario te va a pasar un texto confuso o largo con "
+        "una o múltiples tareas escolares. Analízalo y responde ÚNICAMENTE con un objeto JSON "
+        "válido (sin texto antes o después, sin ```json, sin comentarios), con exactamente esta "
+        "forma:\n"
+        '{"subtitle": "COLEGIO COLOMBO AMERICANO", "title": "título corto y sofisticado del plan '
+        '(máx 6 palabras)", "intro": "1-2 frases explicando el volumen de trabajo y el enfoque '
+        'elegido", "effort_level": <entero 1-5>, "days": [{"day_number": <entero>, "day_title": '
+        '"título corto del enfoque de ese día (máx 5 palabras)", "tasks": [{"subject": "materia", '
+        '"task": "qué hacer exactamente, concreto y accionable"}]}], "technique_title": "nombre de '
+        'la técnica de estudio recomendada", "technique_description": "1-3 frases explicando cómo '
+        'aplicarla a este caso específico", "closing_quote": "frase corta, motivacional, '
+        'sofisticada y con liderazgo"}\n'
+        "Distribuye el trabajo en máximo 5 días. Sé específico y concreto en cada tarea, evita "
+        "generalidades. El intro y closing_quote deben sonar elegantes y con autoridad."
+    )
+    try:
+        completion = groq_client.chat.completions.create(
+            model="openai/gpt-oss-120b",
+            messages=[
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": f"Texto del estudiante:\n{raw_input}"},
+            ],
+            temperature=0.6,
+            max_tokens=2000,
+            response_format={"type": "json_object"},
+        )
+        return json.loads(completion.choices[0].message.content), None
+    except Exception as e:
+        return None, f"<p>Error al generar el plan con Groq: {str(e)}</p>"
+
+
+@app.route('/ai-tutor', methods=['GET', 'POST'])
+@login_required
+def ai_tutor():
+    ai_response = None
+    days_plan = None
+    raw_input = ""
+    if request.method == 'POST':
+        raw_input = request.form.get('raw_input', '')
+        days_plan, ai_response = generate_plan(raw_input)
+
+    return render_template('ai_tutor.html', ai_response=ai_response, days_plan=days_plan, raw_input=raw_input)
+
+
+@app.route('/organizar-semana', methods=['POST'])
+@login_required
+def organize_week():
+    """Toma los pendientes del panel y se los pasa al Desglosador."""
+    pending = Task.query.filter_by(user_id=current_user.id, completed=False)\
+        .order_by(Task.due_date).all()
+
+    if not pending:
+        flash('No tienes deberes pendientes para organizar.', 'error')
+        return redirect(url_for('dashboard'))
+
+    today = datetime.now().date()
+    lineas = ["Estos son mis deberes pendientes. Organízame un plan de estudio."]
+    for t in pending:
+        dias = (t.due_date - today).days
+        if dias < 0:
+            cuando = f"VENCIDO hace {abs(dias)} día(s)"
+        elif dias == 0:
+            cuando = "vence HOY"
+        elif dias == 1:
+            cuando = "vence mañana"
+        else:
+            cuando = f"vence en {dias} días"
+        linea = f"- [{t.type}] {t.subject}: {t.title} ({cuando}, {format_date_es(t.due_date)}"
+        if t.hours:
+            linea += f", ~{t.hours:g} h estimadas"
+        linea += ")"
+        if t.notes:
+            linea += f" Notas: {t.notes}"
+        lineas.append(linea)
+
+    raw_input = "\n".join(lineas)
+    days_plan, ai_response = generate_plan(raw_input)
+
+    return render_template('ai_tutor.html', ai_response=ai_response,
+                           days_plan=days_plan, raw_input=raw_input)
+
+
+@app.route('/ai-tutor/importar', methods=['POST'])
+@login_required
+def import_plan():
+    """Convierte los ítems seleccionados de un plan generado en deberes reales."""
+    selected = request.form.getlist('seleccion')
+    if not selected:
+        flash('No seleccionaste ninguna actividad del plan.', 'error')
+        return redirect(url_for('ai_tutor'))
+
+    try:
+        plan = json.loads(request.form.get('plan_json', ''))
+        days = plan.get('days', [])
+    except (ValueError, AttributeError):
+        flash('No se pudo leer el plan. Genéralo de nuevo.', 'error')
+        return redirect(url_for('ai_tutor'))
+
+    today = datetime.now().date()
+    created = 0
+
+    for ref in selected:
+        try:
+            d_idx, t_idx = (int(n) for n in ref.split('-'))
+            item = days[d_idx]['tasks'][t_idx]
+        except (ValueError, IndexError, KeyError, TypeError):
+            continue
+
+        # "Día 1" es hoy, "Día 2" mañana, y así sucesivamente.
+        try:
+            offset = max(int(days[d_idx].get('day_number', d_idx + 1)) - 1, 0)
+        except (ValueError, TypeError):
+            offset = d_idx
+
+        subject = (item.get('subject') or '').strip()
+        # Respetamos la materia sugerida solo si existe en la lista del colegio.
+        mis = subjects_for(current_user)
+        match = next((s for s in mis if s.lower() == subject.lower()), None)
+
+        title = (item.get('task') or '').strip()
+        if not title:
+            continue
+
+        db.session.add(Task(
+            title=title[:200],
+            subject=match or subject[:100] or mis[0],
+            type='Tarea',
+            due_date=today + timedelta(days=offset),
+            notes=f"Generado por el Desglosador IA · {plan.get('title', 'Plan de trabajo')}",
+            user_id=current_user.id,
+        ))
+        created += 1
+
+    if not created:
+        flash('No se pudo añadir ninguna actividad del plan.', 'error')
+        return redirect(url_for('ai_tutor'))
+
+    db.session.commit()
+    flash(f"{created} actividad{'es' if created > 1 else ''} añadida{'s' if created > 1 else ''} a tu panel.", 'success')
+    return redirect(url_for('dashboard'))
+
+
+def ensure_schema():
+    """Añade columnas nuevas si faltan. Idempotente: se puede correr en cada arranque.
+
+    SQLAlchemy solo crea tablas que no existen; nunca altera las existentes. Como
+    la base de producción ya tiene datos, las columnas nuevas hay que añadirlas a
+    mano. Ojo: en Postgres 'user' es palabra reservada y debe ir entre comillas.
+    """
+    from sqlalchemy import inspect, text
+
+    pendientes = [
+        ('user', 'subjects', 'TEXT'),
+        ('task', 'hours', 'FLOAT'),
+    ]
+
+    inspector = inspect(db.engine)
+    tablas = set(inspector.get_table_names())
+
+    for tabla, columna, tipo in pendientes:
+        if tabla not in tablas:
+            continue  # create_all la creará ya completa
+        existentes = {c['name'] for c in inspector.get_columns(tabla)}
+        if columna in existentes:
+            continue
+        try:
+            db.session.execute(text(f'ALTER TABLE "{tabla}" ADD COLUMN {columna} {tipo}'))
+            db.session.commit()
+            print(f"[schema] columna añadida: {tabla}.{columna}", flush=True)
+        except Exception as e:
+            db.session.rollback()
+            print(f"[schema] no se pudo añadir {tabla}.{columna}: {e}", flush=True)
+
+
+with app.app_context():
+    db.create_all()
+    ensure_schema()
+
+if __name__ == '__main__':
+    app.run(debug=True)
