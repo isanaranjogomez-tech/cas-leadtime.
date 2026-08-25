@@ -308,6 +308,48 @@ def reopen_task(task_id):
     return redirect(url_for('dashboard'))
 
 
+@app.route('/editar/<int:task_id>', methods=['POST'])
+@login_required
+def edit_task(task_id):
+    task = db.session.get(Task, task_id)
+    if not task or task.user_id != current_user.id:
+        flash('No encontramos ese deber.', 'error')
+        return redirect(url_for('dashboard'))
+
+    title = request.form.get('title', '').strip()
+    subject = request.form.get('subject')
+    task_type = request.form.get('type')
+    due_date_str = request.form.get('due_date')
+
+    if not (title and subject and task_type and due_date_str):
+        flash('Completa título, materia, tipo y fecha límite.', 'error')
+        return redirect(url_for('dashboard'))
+
+    try:
+        due_date = datetime.strptime(due_date_str, '%Y-%m-%d').date()
+    except ValueError:
+        flash('La fecha no es válida.', 'error')
+        return redirect(url_for('dashboard'))
+
+    hours = None
+    hours_raw = (request.form.get('hours') or '').strip().replace(',', '.')
+    if hours_raw:
+        try:
+            hours = max(0.0, min(float(hours_raw), 24.0))
+        except ValueError:
+            hours = None
+
+    task.title = title
+    task.subject = subject
+    task.type = task_type
+    task.due_date = due_date
+    task.hours = hours
+    task.notes = request.form.get('notes', '').strip()
+    db.session.commit()
+    flash(f'"{task.title}" actualizado.', 'success')
+    return redirect(url_for('dashboard'))
+
+
 @app.route('/delete/<int:task_id>', methods=['POST'])
 @login_required
 def delete_task(task_id):
