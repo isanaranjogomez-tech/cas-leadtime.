@@ -40,6 +40,10 @@
 
                     <div class="ledger__rule"></div>
 
+                    {% if day.load %}
+                    <p class="ledger__load num">~{{ '%g'|format(day.load) }} h</p>
+                    {% endif %}
+
                     {% if day.exams or day.tasks %}
                     <p class="ledger__count num">
                         {%- if day.exams %}{{ day.exams }} examen{{ 'es' if day.exams > 1 }}{% endif -%}
@@ -100,6 +104,12 @@
                     </div>
 
                     <div class="field">
+                        <label for="hours">Horas estimadas <span class="field__hint">opcional</span></label>
+                        <input class="input" id="hours" type="number" name="hours"
+                               min="0" max="24" step="0.5" placeholder="1.5">
+                    </div>
+
+                    <div class="field">
                         <label for="notes">Notas</label>
                         <textarea class="textarea" id="notes" name="notes" rows="3"
                                   placeholder="Criterios, formato, recordatorios..."></textarea>
@@ -108,6 +118,24 @@
                     <button class="btn btn--primary btn--block" type="submit">Guardar deber</button>
                 </form>
             </div>
+
+            <details class="subjects">
+                <summary class="subjects__head">
+                    <span>Mis materias</span>
+                    <svg class="done__chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
+                </summary>
+                <div class="subjects__body">
+                    <form method="POST" action="{{ url_for('update_subjects') }}">
+                        <div class="field">
+                            <label for="subjects_list">Una materia por línea</label>
+                            <textarea class="textarea" id="subjects_list" name="subjects" rows="8"
+                                      placeholder="{{ subjects|join('&#10;') }}">{{ my_subjects }}</textarea>
+                        </div>
+                        <p class="subjects__hint">Déjalo vacío para volver a la lista del colegio.</p>
+                        <button class="btn btn--quiet btn--block" type="submit">Guardar materias</button>
+                    </form>
+                </div>
+            </details>
         </section>
 
         <!-- PENDIENTES -->
@@ -149,7 +177,7 @@
                         </div>
                         <h3 class="task__title">{{ task.title }}</h3>
                         {% if task.notes %}<p class="task__notes">{{ task.notes }}</p>{% endif %}
-                        <p class="task__due{% if overdue %} task__due--soon{% endif %}">Entrega <strong>{{ task.due_date|fecha }}</strong></p>
+                        <p class="task__due{% if overdue %} task__due--soon{% endif %}">Entrega <strong>{{ task.due_date|fecha }}</strong>{% if task.hours %} · <span class="task__hours num">~{{ '%g'|format(task.hours) }} h</span>{% endif %}</p>
                     </div>
 
                     <div class="task__actions">
