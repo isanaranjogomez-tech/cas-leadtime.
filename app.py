@@ -41,6 +41,15 @@ MONTHS_ES = ["ene", "feb", "mar", "abr", "may", "jun",
              "jul", "ago", "sep", "oct", "nov", "dic"]
 
 
+def subjects_for(user):
+    """Materias del estudiante; si no configuró ninguna, usa la lista del colegio."""
+    if user and user.subjects:
+        propias = [ln.strip() for ln in user.subjects.splitlines() if ln.strip()]
+        if propias:
+            return propias
+    return SUBJECTS
+
+
 def format_date_es(value):
     """25 ago 2026"""
     if not value:
@@ -64,6 +73,7 @@ class User(UserMixin, db.Model):
     username = db.Column(db.String(150), unique=True, nullable=False)
     email = db.Column(db.String(150), unique=True, nullable=False)
     password = db.Column(db.String(200), nullable=False)
+    subjects = db.Column(db.Text, nullable=True)  # una materia por línea; vacío = lista CAS
     tasks = db.relationship('Task', backref='student', lazy=True, cascade="all, delete-orphan")
 
 
@@ -75,6 +85,7 @@ class Task(db.Model):
     due_date = db.Column(db.Date, nullable=False)
     notes = db.Column(db.Text, nullable=True)
     completed = db.Column(db.Boolean, default=False)
+    hours = db.Column(db.Float, nullable=True)  # horas estimadas de trabajo
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
 
 
@@ -156,11 +167,20 @@ def build_weekly_radar(all_pending_tasks):
         exams = sum(1 for t in day_tasks if t.type == 'Examen')
         others = len(day_tasks) - exams
 
-        if exams >= 1 or others >= 4:
+        # Carga en horas. Si un deber no tiene estimación, asumimos 1h
+        # (2h si es examen) para no subestimar el día.
+        load = 0.0
+        for t in day_tasks:
+            if t.hours:
+                load += t.hours
+            else:
+                load += 2.0 if t.type == 'Examen' else 1.0
+
+        if exams >= 1 or load >= 4:
             level = 'critico'
-        elif others >= 2:
+        elif load >= 2:
             level = 'medio'
-        elif others >= 1:
+        elif load > 0:
             level = 'bajo'
         else:
             level = 'libre'
@@ -171,6 +191,7 @@ def build_weekly_radar(all_pending_tasks):
             'day_num': day.strftime('%d'),
             'exams': exams,
             'tasks': others,
+            'load': round(load, 1),
             'level': level,
             'is_today': i == 0,
         })
@@ -187,9 +208,17 @@ def dashboard():
         due_date_str = request.form.get('due_date')
         notes = request.form.get('notes', '').strip()
 
+        hours = None
+        hours_raw = (request.form.get('hours') or '').strip().replace(',', '.')
+        if hours_raw:
+            try:
+                hours = max(0.0, min(float(hours_raw), 24.0))
+            except ValueError:
+                hours = None
+
         if title and subject and task_type and due_date_str:
             due_date = datetime.strptime(due_date_str, '%Y-%m-%d').date()
-            new_task = Task(title=title, subject=subject, type=task_type,
+            new_task = Task(title=title, subject=subject, type=task_type, hours=hours,
                              due_date=due_date, notes=notes, student=current_user)
             db.session.add(new_task)
             db.session.commit()
@@ -212,6 +241,8 @@ def dashboard():
                 pieces.append(f"{day['exams']} examen" + ("es" if day['exams'] > 1 else ""))
             if day['tasks']:
                 pieces.append(f"{day['tasks']} entrega" + ("s" if day['tasks'] > 1 else ""))
+            if day['load']:
+                pieces.append(f"~{day['load']:g} h")
             critical_alerts.append(f"{formatted_date}: {' y '.join(pieces)}")
 
     today = datetime.now().date()
@@ -222,7 +253,22 @@ def dashboard():
 
     return render_template('dashboard.html', tasks=tasks, radar=radar, today=today,
                             overdue_count=overdue_count, done_tasks=done_tasks,
-                            alerts=critical_alerts, subjects=SUBJECTS, task_types=TASK_TYPES)
+                            alerts=critical_alerts, subjects=subjects_for(current_user),
+                            my_subjects=current_user.subjects or "", task_types=TASK_TYPES)
+
+
+@app.route('/materias', methods=['POST'])
+@login_required
+def update_subjects():
+    texto = request.form.get('subjects', '')
+    limpias = [ln.strip() for ln in texto.splitlines() if ln.strip()][:30]
+    current_user.subjects = "\n".join(limpias) if limpias else None
+    db.session.commit()
+    if limpias:
+        flash(f'Guardaste {len(limpias)} materia{"s" if len(limpias) > 1 else ""}.', 'success')
+    else:
+        flash('Volviste a la lista de materias del colegio.', 'success')
+    return redirect(url_for('dashboard'))
 
 
 @app.route('/complete/<int:task_id>', methods=['POST'])
@@ -333,7 +379,10 @@ def organize_week():
             cuando = "vence mañana"
         else:
             cuando = f"vence en {dias} días"
-        linea = f"- [{t.type}] {t.subject}: {t.title} ({cuando}, {format_date_es(t.due_date)})"
+        linea = f"- [{t.type}] {t.subject}: {t.title} ({cuando}, {format_date_es(t.due_date)}"
+        if t.hours:
+            linea += f", ~{t.hours:g} h estimadas"
+        linea += ")"
         if t.notes:
             linea += f" Notas: {t.notes}"
         lineas.append(linea)
@@ -379,7 +428,8 @@ def import_plan():
 
         subject = (item.get('subject') or '').strip()
         # Respetamos la materia sugerida solo si existe en la lista del colegio.
-        match = next((s for s in SUBJECTS if s.lower() == subject.lower()), None)
+        mis = subjects_for(current_user)
+        match = next((s for s in mis if s.lower() == subject.lower()), None)
 
         title = (item.get('task') or '').strip()
         if not title:
@@ -387,7 +437,7 @@ def import_plan():
 
         db.session.add(Task(
             title=title[:200],
-            subject=match or subject[:100] or SUBJECTS[0],
+            subject=match or subject[:100] or mis[0],
             type='Tarea',
             due_date=today + timedelta(days=offset),
             notes=f"Generado por el Desglosador IA · {plan.get('title', 'Plan de trabajo')}",
@@ -404,8 +454,41 @@ def import_plan():
     return redirect(url_for('dashboard'))
 
 
+def ensure_schema():
+    """Añade columnas nuevas si faltan. Idempotente: se puede correr en cada arranque.
+
+    SQLAlchemy solo crea tablas que no existen; nunca altera las existentes. Como
+    la base de producción ya tiene datos, las columnas nuevas hay que añadirlas a
+    mano. Ojo: en Postgres 'user' es palabra reservada y debe ir entre comillas.
+    """
+    from sqlalchemy import inspect, text
+
+    pendientes = [
+        ('user', 'subjects', 'TEXT'),
+        ('task', 'hours', 'FLOAT'),
+    ]
+
+    inspector = inspect(db.engine)
+    tablas = set(inspector.get_table_names())
+
+    for tabla, columna, tipo in pendientes:
+        if tabla not in tablas:
+            continue  # create_all la creará ya completa
+        existentes = {c['name'] for c in inspector.get_columns(tabla)}
+        if columna in existentes:
+            continue
+        try:
+            db.session.execute(text(f'ALTER TABLE "{tabla}" ADD COLUMN {columna} {tipo}'))
+            db.session.commit()
+            print(f"[schema] columna añadida: {tabla}.{columna}", flush=True)
+        except Exception as e:
+            db.session.rollback()
+            print(f"[schema] no se pudo añadir {tabla}.{columna}: {e}", flush=True)
+
+
 with app.app_context():
     db.create_all()
+    ensure_schema()
 
 if __name__ == '__main__':
     app.run(debug=True)
