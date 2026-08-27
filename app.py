@@ -27,6 +27,11 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 # Sin límite de tiempo: un estudiante puede dejar el panel abierto toda la tarde
 # y el token seguiría siendo válido mientras dure la sesión.
 app.config['WTF_CSRF_TIME_LIMIT'] = None
+# No exigimos la cabecera Referer: Safari con "Impedir el rastreo entre sitios"
+# y varias extensiones de privacidad la eliminan, y el formulario quedaba
+# rechazado aunque el token fuera correcto. La validación del token sigue activa,
+# que es la protección real contra peticiones forjadas.
+app.config['WTF_CSRF_SSL_STRICT'] = False
 csrf = CSRFProtect(app)
 
 db = SQLAlchemy(app)
@@ -98,9 +103,15 @@ class Task(db.Model):
 
 @app.errorhandler(CSRFError)
 def handle_csrf_error(e):
-    flash('Tu sesión expiró o el formulario no era válido. Inténtalo de nuevo.', 'error')
+    # Dejamos el motivo en los logs: sin esto, diagnosticar un rechazo es a ciegas.
+    print(f"[csrf] rechazado: {e.description} | ruta={request.path} "
+          f"| referer={request.headers.get('Referer', 'ausente')}", flush=True)
+    flash('No pudimos validar el formulario. Recarga la página e inténtalo de nuevo.', 'error')
     if current_user.is_authenticated:
         return redirect(url_for('dashboard')), 302
+    # Devolvemos a la página donde estaba, no siempre al login.
+    if request.path.startswith('/register'):
+        return redirect(url_for('register')), 302
     return redirect(url_for('login')), 302
 
 
