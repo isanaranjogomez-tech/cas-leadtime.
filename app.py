@@ -23,6 +23,20 @@ if database_url and database_url.startswith('postgres://'):
 app.config['SQLALCHEMY_DATABASE_URI'] = database_url or 'sqlite:///local_dev.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
+# Neon duerme la base tras unos minutos sin uso y las conexiones guardadas en el
+# pool mueren sin avisar. Sin esto, la primera visita tras un rato de inactividad
+# fallaba con "SSL connection has been closed unexpectedly" y devolvía un 500.
+#   pool_pre_ping: comprueba la conexión antes de usarla y la renueva si murió.
+#   pool_recycle:  descarta conexiones con más de 5 minutos, sin esperar a que fallen.
+if database_url:
+    app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {
+        'pool_pre_ping': True,
+        'pool_recycle': 300,
+        'pool_size': 5,
+        'max_overflow': 2,
+        'connect_args': {'connect_timeout': 10},
+    }
+
 # Protección CSRF en todos los formularios POST.
 # Sin límite de tiempo: un estudiante puede dejar el panel abierto toda la tarde
 # y el token seguiría siendo válido mientras dure la sesión.
@@ -570,9 +584,31 @@ def ensure_schema():
             print(f"[schema] no se pudo añadir {tabla}.{columna}: {e}", flush=True)
 
 
-with app.app_context():
-    db.create_all()
-    ensure_schema()
+def init_database(intentos=3):
+    """Prepara el esquema. Si Neon está dormida, reintenta antes de rendirse.
+
+    Antes, un fallo aquí tumbaba el arranque entero y la aplicación quedaba
+    inaccesible. Ahora arranca igual: la base puede despertar en la primera
+    petición real.
+    """
+    import time
+    for intento in range(1, intentos + 1):
+        try:
+            with app.app_context():
+                db.create_all()
+                ensure_schema()
+            return True
+        except Exception as e:
+            if intento < intentos:
+                print(f"[inicio] base no disponible (intento {intento}/{intentos}): {e}", flush=True)
+                time.sleep(3)
+            else:
+                print(f"[inicio] no se pudo preparar el esquema: {e}", flush=True)
+                print("[inicio] la aplicación arranca igual y reintentará al recibir tráfico.", flush=True)
+    return False
+
+
+init_database()
 
 if __name__ == '__main__':
     app.run(debug=True)
