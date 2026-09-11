@@ -129,14 +129,33 @@ def handle_csrf_error(e):
     return redirect(url_for('login')), 302
 
 
+@app.errorhandler(404)
+def handle_404(e):
+    flash('Esa página no existe.', 'error')
+    if current_user.is_authenticated:
+        return redirect(url_for('dashboard')), 302
+    return redirect(url_for('login')), 302
+
+
+@app.errorhandler(405)
+def handle_405(e):
+    flash('Algo se envió de forma inesperada. Inténtalo de nuevo.', 'error')
+    if current_user.is_authenticated:
+        return redirect(url_for('dashboard')), 302
+    return redirect(url_for('login')), 302
+
+
 @login_manager.user_loader
 def load_user(user_id):
     return db.session.get(User, int(user_id))
 
 
 # ---- AUTENTICACIÓN ----
-@app.route('/')
+@app.route('/', methods=['GET', 'POST'])
 def index():
+    # Aceptamos POST a propósito: si el navegador reenvía un formulario a la raíz
+    # (autocompletado de Safari, recargar tras enviar, volver atrás), antes salía
+    # un "Method Not Allowed" en crudo. Ahora simplemente reencaminamos.
     if current_user.is_authenticated:
         return redirect(url_for('dashboard'))
     return redirect(url_for('login'))
