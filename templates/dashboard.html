@@ -98,7 +98,7 @@
         <section class="card">
             <div class="card__head"><h2 class="card__title">Añadir un deber</h2></div>
             <div class="card__body">
-                <form method="POST">
+                <form method="POST" action="{{ url_for('dashboard') }}">
                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                     <div class="field">
                         <label for="title">Título</label>
