@@ -5,7 +5,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 from flask_wtf.csrf import CSRFProtect, CSRFError
 from werkzeug.security import generate_password_hash, check_password_hash
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from groq import Groq
 
 app = Flask(__name__)
@@ -59,6 +59,18 @@ groq_client = Groq(api_key=GROQ_API_KEY) if GROQ_API_KEY else None
 SUBJECTS = ["Math", "Language Arts", "Lenguaje", "Geometría", "Global Perspectives",
             "Sociales", "Biología", "Física", "Química", "Computer Science"]
 TASK_TYPES = ["Tarea", "Examen", "Proyecto", "Extracurricular"]
+
+# ---- Zona horaria ----
+# Render corre en UTC, cinco horas por delante de Colombia. Sin esto, desde las
+# 7 p. m. hora de Bogotá la app ya creía que era el día siguiente.
+# Colombia no tiene horario de verano, así que un desfase fijo es exacto.
+TZ_COLOMBIA = timezone(timedelta(hours=-5), 'America/Bogota')
+
+
+def hoy():
+    """La fecha de hoy en Colombia, no la del servidor."""
+    return datetime.now(TZ_COLOMBIA).date()
+
 
 # ---- Fechas en español (el servidor corre con locale C, así que no
 # dependemos de strftime para los nombres de días y meses) ----
@@ -218,7 +230,7 @@ def logout():
 # ---- DASHBOARD ----
 def build_weekly_radar(all_pending_tasks):
     """Construye un radar de 7 días (hoy + 6) con el nivel de carga por día."""
-    today = datetime.now().date()
+    today = hoy()
     radar = []
     for i in range(7):
         day = today + timedelta(days=i)
@@ -304,7 +316,7 @@ def dashboard():
                 pieces.append(f"~{day['load']:g} h")
             critical_alerts.append(f"{formatted_date}: {' y '.join(pieces)}")
 
-    today = datetime.now().date()
+    today = hoy()
     overdue_count = sum(1 for t in tasks if t.due_date < today)
 
     # Lo que cae más allá de la semana visible. Sin esto, un proyecto a tres
@@ -484,7 +496,7 @@ def organize_week():
         flash('No tienes deberes pendientes para organizar.', 'error')
         return redirect(url_for('dashboard'))
 
-    today = datetime.now().date()
+    today = hoy()
     lineas = ["Estos son mis deberes pendientes. Organízame un plan de estudio."]
     for t in pending:
         dias = (t.due_date - today).days
@@ -527,7 +539,7 @@ def import_plan():
         flash('No se pudo leer el plan. Genéralo de nuevo.', 'error')
         return redirect(url_for('ai_tutor'))
 
-    today = datetime.now().date()
+    today = hoy()
     created = 0
 
     for ref in selected:
